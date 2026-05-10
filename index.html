@@ -1,0 +1,2503 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOMEX GROUP — Financial Calculator</title>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg2: #111111;
+    --bg3: #1a1a1a;
+    --card: #141414;
+    --border: #222222;
+    --border2: #2a2a2a;
+    --gold: #c9a84c;
+    --gold2: #e8c97a;
+    --gold3: #a07830;
+    --text: #e8e8e8;
+    --text2: #999999;
+    --text3: #666666;
+    --green: #2ecc71;
+    --red: #e74c3c;
+    --amber: #f39c12;
+    --radius: 10px;
+    --radius2: 6px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.5);
+    --shadow2: 0 2px 12px rgba(0,0,0,0.4);
+    --header-h: 72px;
+    --nav-h: 56px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ─────────────────────────────────────────────── */
+  .header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-h);
+    position: sticky;
+    top: 0;
+    z-index: 101;
+  }
+  .logo { display: flex; align-items: center; gap: 14px; }
+  .logo-icon {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--gold3), var(--gold2));
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700; color: #1a1000;
+    flex-shrink: 0;
+  }
+  .logo-text { display: flex; flex-direction: column; gap: 1px; }
+  .company-name {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: var(--gold2);
+    text-transform: uppercase;
+    line-height: 1.15;
+  }
+  .company-subtitle {
+    font-size: 11px;
+    color: var(--text3);
+    font-weight: 400;
+    letter-spacing: 0.2px;
+  }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .lang-switcher {
+    display: flex;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .lang-btn {
+    background: none; border: none; color: var(--text2);
+    padding: 6px 12px; cursor: pointer; font-size: 12px;
+    font-weight: 500; transition: all 0.15s;
+  }
+  .lang-btn.active { background: var(--gold3); color: #fff; }
+  .lang-btn:hover:not(.active) { color: var(--text); }
+
+  /* ── MONTH NAV BAR ──────────────────────────────────────── */
+  .month-nav {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: var(--nav-h);
+    position: sticky;
+    top: var(--header-h);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+  }
+  .month-nav-inner {
+    max-width: 1280px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .year-ctrl { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .year-btn {
+    background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 4px; color: var(--text2); cursor: pointer;
+    padding: 5px 9px; font-size: 11px; transition: all 0.15s; line-height: 1;
+  }
+  .year-btn:hover { border-color: var(--gold3); color: var(--gold2); }
+  .year-display {
+    font-size: 14px; font-weight: 700; color: var(--gold2);
+    min-width: 44px; text-align: center; letter-spacing: 0.5px;
+  }
+  .nav-divider { width: 1px; height: 28px; background: var(--border2); flex-shrink: 0; }
+  .month-tabs { display: flex; gap: 3px; flex: 1; overflow-x: auto; }
+  .month-tabs::-webkit-scrollbar { height: 0; }
+  .month-tab {
+    background: none; border: 1px solid transparent;
+    border-radius: 5px; color: var(--text2); cursor: pointer;
+    padding: 5px 10px; font-size: 12px; font-weight: 500;
+    transition: all 0.15s; white-space: nowrap; line-height: 1.4;
+    flex-shrink: 0;
+  }
+  .month-tab:hover:not(.m-active) { border-color: var(--border2); color: var(--text); }
+  .month-tab.m-active {
+    background: linear-gradient(135deg, var(--gold3), var(--gold));
+    border-color: transparent; color: #fff; font-weight: 600;
+  }
+  .month-tab.m-has-data:not(.m-active) {
+    border-color: rgba(201,168,76,0.25);
+    color: var(--text2);
+  }
+  .save-ctrl {
+    display: flex; align-items: center; gap: 10px;
+    flex-shrink: 0; margin-left: 4px;
+  }
+  .btn-save {
+    background: linear-gradient(135deg, var(--gold3), var(--gold));
+    border: none; border-radius: var(--radius2);
+    color: #fff; cursor: pointer; font-size: 13px;
+    font-weight: 600; padding: 7px 18px; transition: opacity 0.15s;
+    white-space: nowrap;
+  }
+  .btn-save:hover { opacity: 0.87; }
+  .save-status {
+    font-size: 12px; font-weight: 500; white-space: nowrap;
+    transition: color 0.2s;
+  }
+  .save-status.ss-saved  { color: var(--green); }
+  .save-status.ss-dirty  { color: var(--amber); }
+
+  /* ── BUTTONS ─────────────────────────────────────────────── */
+  .btn {
+    border: none; border-radius: var(--radius2); cursor: pointer;
+    font-size: 13px; font-weight: 500; padding: 8px 16px; transition: all 0.15s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-primary { background: linear-gradient(135deg, var(--gold3), var(--gold)); color: #fff; }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-ghost { background: var(--bg3); color: var(--text2); border: 1px solid var(--border2); }
+  .btn-ghost:hover { border-color: var(--gold3); color: var(--gold2); }
+  .btn-danger { background: rgba(231,76,60,0.15); color: var(--red); border: 1px solid rgba(231,76,60,0.2); }
+  .btn-danger:hover { background: rgba(231,76,60,0.25); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+  /* ── MAIN ────────────────────────────────────────────────── */
+  .main {
+    max-width: 1280px; margin: 0 auto;
+    padding: 28px 24px; display: flex; flex-direction: column; gap: 22px;
+  }
+
+  /* ── SECTION CARD ────────────────────────────────────────── */
+  .section-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow2); }
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 15px 24px; border-bottom: 1px solid var(--border); background: var(--bg2);
+  }
+  .section-header-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+  .section-header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .section-title-text { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; }
+  .section-icon {
+    width: 28px; height: 28px; border-radius: 6px; display: flex;
+    align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;
+    background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05));
+    border: 1px solid rgba(201,168,76,0.2);
+  }
+  .section-mini {
+    display: none; font-size: 12px; font-weight: 600; color: var(--gold2);
+    background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.18);
+    border-radius: 4px; padding: 2px 9px;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .collapse-btn {
+    background: none; border: 1px solid var(--border2); border-radius: 4px;
+    color: var(--text2); cursor: pointer; padding: 4px 9px; font-size: 11px;
+    transition: all 0.15s; line-height: 1; font-weight: 700; flex-shrink: 0;
+  }
+  .collapse-btn:hover { border-color: var(--gold3); color: var(--gold2); }
+  .section-body { padding: 20px 24px; }
+  .section-body.collapsed { display: none; }
+  .action-bar {
+    display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    padding: 14px 24px; border-top: 1px solid var(--border); background: var(--bg2);
+  }
+  .action-bar.collapsed { display: none; }
+
+  /* ── TABLE ───────────────────────────────────────────────── */
+  .tbl-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.6px; color: var(--text3); padding: 0 10px 11px 0;
+    border-bottom: 1px solid var(--border); white-space: nowrap;
+  }
+  td {
+    padding: 9px 10px 9px 0; border-bottom: 1px solid var(--border);
+    vertical-align: middle; color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.014); }
+  .tbl-input {
+    background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius2);
+    color: var(--text); font-size: 13px; padding: 6px 9px; width: 100%; outline: none;
+    transition: border-color 0.15s; min-width: 70px;
+  }
+  .tbl-input:focus { border-color: var(--gold3); }
+  .tbl-input[readonly] {
+    background: rgba(201,168,76,0.04); border-color: rgba(201,168,76,0.12);
+    color: var(--gold2); cursor: default;
+  }
+  .tbl-input:disabled { opacity: 0.35; cursor: not-allowed; }
+  .tbl-select {
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666666'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 9px center;
+    background-color: var(--bg3); padding-right: 26px; cursor: pointer;
+  }
+  /* TOGGLE */
+  .toggle-wrap { display: flex; align-items: center; justify-content: center; }
+  .toggle { position: relative; width: 36px; height: 20px; cursor: pointer; display: block; }
+  .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .toggle-slider { position: absolute; inset: 0; background: var(--border2); border-radius: 20px; transition: 0.2s; }
+  .toggle-slider::before {
+    content: ''; position: absolute; left: 2px; top: 2px;
+    width: 16px; height: 16px; background: var(--text3); border-radius: 50%; transition: 0.2s;
+  }
+  .toggle input:checked + .toggle-slider { background: var(--gold3); }
+  .toggle input:checked + .toggle-slider::before { background: #fff; transform: translateX(16px); }
+  /* DISPLAY CELLS */
+  td.ro { color: var(--gold2); font-variant-numeric: tabular-nums; font-size: 13px; font-weight: 500; }
+  td.ro-dim { color: var(--text3); font-size: 13px; }
+  td.ro-red { color: var(--red); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .del-btn {
+    background: none; border: none; color: var(--text3); cursor: pointer;
+    padding: 4px 6px; border-radius: 4px; font-size: 16px; line-height: 1; transition: all 0.15s;
+  }
+  .del-btn:hover { color: var(--red); background: rgba(231,76,60,0.1); }
+
+  /* ── TOTALS ──────────────────────────────────────────────── */
+  .totals-row {
+    display: flex; align-items: center; justify-content: flex-end; gap: 12px;
+    padding: 13px 0 0; margin-top: 4px; border-top: 1px solid var(--border); flex-wrap: wrap;
+  }
+  .totals-label { color: var(--text2); font-size: 13px; }
+  .totals-value { font-size: 17px; font-weight: 700; color: var(--gold2); font-variant-numeric: tabular-nums; }
+  .totals-sep { color: var(--border2); font-size: 16px; }
+
+  /* ── VAT STRIP ───────────────────────────────────────────── */
+  .vat-totals-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px,1fr)); gap: 10px; margin-top: 18px; }
+  .vat-strip-item { background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius2); padding: 13px 15px; }
+  .vsi-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text3); margin-bottom: 5px; }
+  .vsi-val { font-size: 17px; font-weight: 700; color: var(--gold2); font-variant-numeric: tabular-nums; }
+
+  /* ── FORMULA HINT ────────────────────────────────────────── */
+  .formula-hint {
+    background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.15);
+    border-radius: var(--radius2); padding: 9px 13px; font-size: 12px;
+    color: var(--text2); margin-bottom: 15px; line-height: 1.7;
+  }
+  .formula-hint strong { color: var(--gold2); }
+
+  /* ── BADGE ───────────────────────────────────────────────── */
+  .badge {
+    display: inline-block; background: rgba(201,168,76,0.12); color: var(--gold2);
+    border: 1px solid rgba(201,168,76,0.2); border-radius: 4px; font-size: 10px;
+    font-weight: 600; padding: 2px 7px; letter-spacing: 0.4px; text-transform: uppercase;
+  }
+
+  /* ── DASHBOARD ───────────────────────────────────────────── */
+  .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(205px,1fr)); gap: 14px; }
+  .dash-card { background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius); padding: 18px; position: relative; overflow: hidden; }
+  .dash-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background: linear-gradient(90deg, var(--gold3), var(--gold2)); opacity:0; transition:opacity 0.2s; }
+  .dash-card.highlight::before { opacity:1; }
+  .dash-card .dc-label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.6px; color:var(--text3); margin-bottom:9px; }
+  .dash-card .dc-value { font-size:21px; font-weight:700; font-variant-numeric:tabular-nums; color:var(--text); line-height:1.2; }
+  .dash-card .dc-value.green { color: var(--green); }
+  .dash-card .dc-value.red   { color: var(--red); }
+  .dash-card .dc-value.gold  { color: var(--gold2); }
+  .dash-card .dc-sub { font-size:11px; color:var(--text3); margin-top:5px; }
+
+  /* ── EXPENSE FILTER BAR ──────────────────────────────────── */
+  .exp-filter-bar { margin-bottom: 15px; display: flex; flex-direction: column; gap: 9px; }
+  .period-row { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+  .period-tabs {
+    display: flex; background: var(--bg3);
+    border: 1px solid var(--border2); border-radius: 6px; overflow: hidden;
+  }
+  .period-tab {
+    background: none; border: none; color: var(--text2);
+    padding: 5px 13px; cursor: pointer; font-size: 12px;
+    font-weight: 500; transition: all 0.15s; white-space: nowrap;
+  }
+  .period-tab.active { background: var(--gold3); color: #fff; }
+  .period-tab:hover:not(.active) { color: var(--text); }
+  .period-select {
+    background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: var(--radius2); color: var(--text);
+    font-size: 13px; padding: 5px 27px 5px 9px; outline: none; cursor: pointer;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666666'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 9px center;
+    background-color: var(--bg3);
+  }
+  .period-select:focus { border-color: var(--gold3); outline: none; }
+  .filter-chips-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+  .filter-chip {
+    background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 20px; color: var(--text2); font-size: 12px;
+    font-weight: 500; padding: 3px 11px; cursor: pointer;
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .filter-chip.active { background: rgba(201,168,76,0.12); border-color: var(--gold3); color: var(--gold2); }
+  .filter-chip:hover:not(.active) { border-color: var(--text3); color: var(--text); }
+
+  /* ── CATEGORY SUMMARY ────────────────────────────────────── */
+  .cat-summary { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 18px; }
+  .cat-summary-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 11px; flex-wrap: wrap; gap: 7px; }
+  .cat-summary-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text3); }
+  .cat-summary-period {
+    font-size: 12px; font-weight: 600; color: var(--gold2);
+    background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 4px; padding: 2px 9px;
+  }
+  .cat-summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 9px; }
+  .cat-card { background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius2); padding: 12px 14px; cursor: pointer; transition: border-color 0.15s; }
+  .cat-card:hover { border-color: var(--text3); }
+  .cat-card.cat-active { border-color: var(--gold3); background: rgba(201,168,76,0.06); }
+  .cc-label { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cc-amount { font-size: 15px; font-weight: 700; color: var(--gold2); font-variant-numeric: tabular-nums; }
+  .cc-bar { height: 2px; background: var(--border2); border-radius: 1px; margin: 6px 0 4px; }
+  .cc-bar-fill { height: 2px; background: linear-gradient(90deg, var(--gold3), var(--gold2)); border-radius: 1px; transition: width 0.3s; }
+  .cc-meta { font-size: 11px; color: var(--text3); display: flex; justify-content: space-between; }
+
+  /* ── MISC ────────────────────────────────────────────────── */
+  .empty-state { text-align: center; padding: 26px; color: var(--text3); font-size: 13px; }
+  .spacer { flex: 1; }
+
+  /* ── PRINT ───────────────────────────────────────────────── */
+  @media print {
+    .header, .month-nav, .action-bar, .btn, .del-btn, .lang-switcher,
+    .collapse-btn, .exp-filter-bar, .save-ctrl { display: none !important; }
+    body { background: #fff; color: #000; }
+    .section-card { border: 1px solid #ccc; margin-bottom: 14px; page-break-inside: avoid; }
+    .tbl-input, .tbl-select { border: 1px solid #ccc; background: #fff; color: #000; }
+    .section-body.collapsed { display: block !important; }
+    .dashboard-grid { grid-template-columns: repeat(3,1fr); }
+    .cat-summary-grid { grid-template-columns: repeat(4,1fr); }
+  }
+
+  /* ── SCROLLBAR ───────────────────────────────────────────── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+  /* ── NOTIFICATION ────────────────────────────────────────── */
+  .notif {
+    position: fixed; bottom: 24px; right: 24px; background: var(--bg2);
+    border: 1px solid var(--border2); border-left: 3px solid var(--gold);
+    border-radius: var(--radius2); padding: 11px 17px; font-size: 13px; color: var(--text);
+    box-shadow: var(--shadow); opacity: 0; transform: translateY(8px); transition: all 0.25s;
+    z-index: 9999; pointer-events: none;
+  }
+  .notif.show { opacity: 1; transform: translateY(0); }
+
+  /* ── TARGET SECTION ──────────────────────────────────────── */
+  .target-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: stretch; }
+  @media (max-width: 720px) { .target-wrap { grid-template-columns: 1fr; } }
+  .target-input-row { display: flex; flex-direction: column; gap: 8px; }
+  .target-input-row label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text3); }
+  .target-input {
+    background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius2);
+    color: var(--gold2); font-size: 18px; font-weight: 700; padding: 10px 12px;
+    outline: none; transition: border-color 0.15s; font-variant-numeric: tabular-nums;
+  }
+  .target-input:focus { border-color: var(--gold3); }
+  .target-input:disabled { opacity: 0.5; cursor: not-allowed; }
+  .target-stats { display: flex; flex-direction: column; gap: 10px; }
+  .target-stat-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .target-stat-label { font-size: 12px; color: var(--text2); }
+  .target-stat-val { font-size: 14px; font-weight: 700; color: var(--gold2); font-variant-numeric: tabular-nums; }
+  .target-pct-big {
+    font-size: 38px; font-weight: 800; font-variant-numeric: tabular-nums;
+    line-height: 1; letter-spacing: -0.5px; margin-bottom: 4px;
+  }
+  .target-pct-big.tg-warn    { color: var(--red); }
+  .target-pct-big.tg-normal  { color: var(--amber); }
+  .target-pct-big.tg-success { color: var(--green); }
+  .target-progress-track {
+    height: 10px; background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 6px; overflow: hidden; margin: 8px 0;
+  }
+  .target-progress-fill {
+    height: 100%; transition: width 0.4s ease, background 0.3s;
+    border-radius: 5px;
+  }
+  .target-progress-fill.tg-warn    { background: linear-gradient(90deg, #c0392b, var(--red)); }
+  .target-progress-fill.tg-normal  { background: linear-gradient(90deg, var(--gold3), var(--amber)); }
+  .target-progress-fill.tg-success { background: linear-gradient(90deg, #1e8449, var(--green)); }
+  .target-status-pill {
+    display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.6px; padding: 3px 9px; border-radius: 4px;
+  }
+  .target-status-pill.tg-warn    { background: rgba(231,76,60,0.15); color: var(--red); border: 1px solid rgba(231,76,60,0.3); }
+  .target-status-pill.tg-normal  { background: rgba(243,156,18,0.15); color: var(--amber); border: 1px solid rgba(243,156,18,0.3); }
+  .target-status-pill.tg-success { background: rgba(46,204,113,0.15); color: var(--green); border: 1px solid rgba(46,204,113,0.3); }
+
+  /* ── CLOSE / LOCK CONTROLS ───────────────────────────────── */
+  .btn-close-month {
+    background: rgba(46,204,113,0.12); color: var(--green);
+    border: 1px solid rgba(46,204,113,0.3);
+  }
+  .btn-close-month:hover:not(:disabled) { background: rgba(46,204,113,0.22); }
+  .btn-close-month:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-edit-closed {
+    background: rgba(243,156,18,0.12); color: var(--amber);
+    border: 1px solid rgba(243,156,18,0.3);
+  }
+  .btn-edit-closed:hover { background: rgba(243,156,18,0.22); }
+  .closed-banner {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    background: rgba(46,204,113,0.06); border: 1px solid rgba(46,204,113,0.25);
+    border-radius: var(--radius2); padding: 10px 14px; margin-bottom: 16px;
+  }
+  .closed-banner-icon { font-size: 16px; color: var(--green); }
+  .closed-banner-text { flex: 1; font-size: 13px; color: var(--text); }
+  .closed-banner-text b { color: var(--green); }
+  .closed-banner-meta { font-size: 11px; color: var(--text3); }
+  body.is-locked .tbl-input,
+  body.is-locked .tbl-select,
+  body.is-locked .target-input { pointer-events: none; opacity: 0.7; }
+  body.is-locked .tbl-input:not([readonly]),
+  body.is-locked .tbl-select,
+  body.is-locked .target-input { background: rgba(46,204,113,0.04); border-color: rgba(46,204,113,0.15); }
+  body.is-locked .toggle { pointer-events: none; opacity: 0.55; }
+  body.is-locked .del-btn,
+  body.is-locked .action-bar .btn-primary,
+  body.is-locked .btn-close-month { pointer-events: none; }
+  body.is-locked .del-btn { opacity: 0.25; }
+  body.is-locked .action-bar .btn-primary { opacity: 0.4; }
+
+  /* ── CORRECTION LOG ──────────────────────────────────────── */
+  .corr-log { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 16px; }
+  .corr-log-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text3); margin-bottom: 10px; }
+  .corr-list { display: flex; flex-direction: column; gap: 8px; }
+  .corr-item {
+    background: var(--bg3); border: 1px solid var(--border2);
+    border-left: 3px solid var(--amber);
+    border-radius: var(--radius2); padding: 9px 13px;
+  }
+  .corr-item-head { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+  .corr-item-when { font-size: 11px; color: var(--text3); font-variant-numeric: tabular-nums; }
+  .corr-item-tag { font-size: 10px; color: var(--amber); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .corr-item-text { font-size: 13px; color: var(--text); line-height: 1.45; word-wrap: break-word; }
+
+  /* ── TEXTAREA (modal) ────────────────────────────────────── */
+  .modal-textarea {
+    background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius2);
+    color: var(--text); font-size: 13px; padding: 9px 11px; width: 100%; outline: none;
+    transition: border-color 0.15s; resize: vertical; min-height: 86px;
+    font-family: inherit; line-height: 1.5; margin-bottom: 18px;
+  }
+  .modal-textarea:focus { border-color: var(--gold3); }
+
+  /* ── CLOUD STATUS / SETTINGS BUTTON ──────────────────────── */
+  .cloud-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 14px; padding: 4px 10px;
+    font-size: 11px; font-weight: 600; color: var(--text2);
+    white-space: nowrap; transition: all 0.2s;
+  }
+  .cloud-pill .cp-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--text3); flex-shrink: 0;
+  }
+  .cloud-pill.cp-online   { color: var(--green); border-color: rgba(46,204,113,0.3); }
+  .cloud-pill.cp-online   .cp-dot { background: var(--green); box-shadow: 0 0 6px rgba(46,204,113,0.6); }
+  .cloud-pill.cp-syncing  { color: var(--gold2); border-color: rgba(201,168,76,0.3); }
+  .cloud-pill.cp-syncing  .cp-dot { background: var(--gold); animation: pulse 1.2s ease-in-out infinite; }
+  .cloud-pill.cp-offline  { color: var(--amber); border-color: rgba(243,156,18,0.3); }
+  .cloud-pill.cp-offline  .cp-dot { background: var(--amber); }
+  .cloud-pill.cp-error    { color: var(--red); border-color: rgba(231,76,60,0.3); }
+  .cloud-pill.cp-error    .cp-dot { background: var(--red); }
+  .cloud-pill.cp-saved    { color: var(--green); border-color: rgba(46,204,113,0.4); }
+  .cloud-pill.cp-saved    .cp-dot { background: var(--green); box-shadow: 0 0 8px rgba(46,204,113,0.8); }
+  .cloud-pill.cp-view     { color: var(--text2); border-color: var(--border2); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.45} }
+
+  .icon-btn {
+    background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px;
+    color: var(--text2); cursor: pointer; padding: 5px 9px;
+    font-size: 14px; line-height: 1; transition: all 0.15s;
+  }
+  .icon-btn:hover { border-color: var(--gold3); color: var(--gold2); }
+  .mode-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 14px; padding: 3px 10px;
+    font-size: 10px; font-weight: 700; color: var(--gold2);
+    text-transform: uppercase; letter-spacing: 0.6px;
+  }
+  .mode-pill.mp-view { color: var(--text2); background: var(--bg3); border-color: var(--border2); }
+
+  /* ── VIEW-ONLY MODE LOCK ─────────────────────────────────── */
+  body.is-view-only .tbl-input,
+  body.is-view-only .tbl-select,
+  body.is-view-only .target-input { pointer-events: none; opacity: 0.7; }
+  body.is-view-only .toggle { pointer-events: none; opacity: 0.55; }
+  body.is-view-only .del-btn,
+  body.is-view-only .action-bar .btn-primary,
+  body.is-view-only .btn-close-month,
+  body.is-view-only .btn-edit-closed,
+  body.is-view-only #clearAllBtn,
+  body.is-view-only .btn-save { display: none !important; }
+
+  /* ── SETTINGS MODAL ──────────────────────────────────────── */
+  .modal.modal-wide { max-width: 480px; }
+  .field-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .field-group label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text3); }
+  .field-input {
+    background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius2);
+    color: var(--text); font-size: 13px; padding: 8px 11px; outline: none;
+    transition: border-color 0.15s; font-family: inherit;
+  }
+  .field-input:focus { border-color: var(--gold3); }
+  .seg { display: inline-flex; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; overflow: hidden; }
+  .seg-btn {
+    background: none; border: none; color: var(--text2);
+    padding: 6px 14px; font-size: 12px; font-weight: 500;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .seg-btn.active { background: var(--gold3); color: #fff; }
+  .seg-btn:hover:not(.active) { color: var(--text); }
+  .field-help { font-size: 11px; color: var(--text3); margin-top: 4px; line-height: 1.5; }
+
+  /* ── MODAL ───────────────────────────────────────────────── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.72);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--card); border: 1px solid var(--border2); border-radius: var(--radius);
+    padding: 28px; max-width: 400px; width: 90%; box-shadow: var(--shadow);
+    transform: scale(0.96); transition: transform 0.2s;
+  }
+  .modal-overlay.show .modal { transform: scale(1); }
+  .modal h3 { font-size: 16px; font-weight: 600; margin-bottom: 10px; }
+  .modal p { font-size: 13px; color: var(--text2); margin-bottom: 22px; line-height: 1.65; }
+  .modal-btns { display: flex; gap: 10px; justify-content: flex-end; }
+</style>
+</head>
+<body>
+
+<!-- NOTIFICATION -->
+<div class="notif" id="notif"></div>
+
+<!-- CLEAR ALL MODAL -->
+<div class="modal-overlay" id="clearModal">
+  <div class="modal">
+    <h3 data-ka="ყველა მონაცემის წაშლა" data-ru="Удалить все данные">ყველა მონაცემის წაშლა</h3>
+    <p data-ka="ამ თვის ყველა ჩანაწერი წაიშლება. ეს ქმედება შეუქცევადია." data-ru="Все записи этого месяца будут удалены. Это действие необратимо.">ამ თვის ყველა ჩანაწერი წაიშლება. ეს ქმედება შეუქცევადია.</p>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeModal('clearModal')">
+        <span data-ka="გაუქმება" data-ru="Отмена">გაუქმება</span>
+      </button>
+      <button class="btn btn-danger" onclick="confirmClear()">
+        <span data-ka="წაშლა" data-ru="Удалить">წაშლა</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- UNSAVED CHANGES MODAL -->
+<div class="modal-overlay" id="unsavedModal">
+  <div class="modal">
+    <h3 data-ka="შეუნახავი ცვლილებები" data-ru="Несохранённые изменения">შეუნახავი ცვლილებები</h3>
+    <p data-ka="მონაცემები შეცვლილია და ჯერ არ არის შენახული. ნამდვილად გსურთ გაგრძელება?" data-ru="Данные изменены и ещё не сохранены. Вы действительно хотите продолжить?">მონაცემები შეცვლილია და ჯერ არ არის შენახული. ნამდვილად გსურთ გაგრძელება?</p>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="cancelUnsaved()">
+        <span data-ka="გაუქმება" data-ru="Отмена">გაუქმება</span>
+      </button>
+      <button class="btn btn-danger" onclick="confirmUnsaved()">
+        <span data-ka="გაგრძელება" data-ru="Продолжить">გაგრძელება</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <h3 data-ka="წაშლის დადასტურება" data-ru="Подтверждение удаления">წაშლის დადასტურება</h3>
+    <p data-ka="ნამდვილად გსურთ ამის წაშლა?" data-ru="Вы действительно хотите удалить это?">ნამდვილად გსურთ ამის წაშლა?</p>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="cancelDelete()">
+        <span data-ka="გაუქმება" data-ru="Отмена">გაუქმება</span>
+      </button>
+      <button class="btn btn-danger" onclick="confirmDelete()">
+        <span data-ka="წაშლა" data-ru="Удалить">წაშლა</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- CLOSE MONTH CONFIRM MODAL -->
+<div class="modal-overlay" id="closeMonthModal">
+  <div class="modal">
+    <h3 data-ka="თვის დახურვა" data-ru="Закрыть месяц">თვის დახურვა</h3>
+    <p id="closeMonthText" data-ka="ეს თვე დაიხურება და ჩანაწერები დაიბლოკება. გაგრძელება?" data-ru="Этот месяц будет закрыт и записи будут заблокированы. Продолжить?">ეს თვე დაიხურება და ჩანაწერები დაიბლოკება. გაგრძელება?</p>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeModal('closeMonthModal')">
+        <span data-ka="გაუქმება" data-ru="Отмена">გაუქმება</span>
+      </button>
+      <button class="btn btn-primary" onclick="confirmCloseMonth()">
+        <span data-ka="დახურვა" data-ru="Закрыть">დახურვა</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT CLOSED MONTH (COMMENT REQUIRED) MODAL -->
+<div class="modal-overlay" id="editClosedModal">
+  <div class="modal">
+    <h3 data-ka="დახურული თვის ჩასწორება" data-ru="Редактирование закрытого месяца">დახურული თვის ჩასწორება</h3>
+    <p data-ka="გთხოვთ მიუთითოთ მიზეზი, რატომ ხდება დახურული თვის ჩასწორება." data-ru="Пожалуйста, укажите причину редактирования закрытого месяца.">გთხოვთ მიუთითოთ მიზეზი, რატომ ხდება დახურული თვის ჩასწორება.</p>
+    <textarea id="editClosedComment" class="modal-textarea" data-ph-ka="ჩასწორების მიზეზი..." data-ph-ru="Причина редактирования..." placeholder="ჩასწორების მიზეზი..."></textarea>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeModal('editClosedModal')">
+        <span data-ka="გაუქმება" data-ru="Отмена">გაუქმება</span>
+      </button>
+      <button class="btn btn-primary" onclick="confirmEditClosed()">
+        <span data-ka="ჩასწორების დაშვება" data-ru="Разрешить правку">ჩასწორების დაშვება</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal modal-wide">
+    <h3 data-ka="ბექენდის პარამეტრები" data-ru="Настройки бэкенда">ბექენდის პარამეტრები</h3>
+    <p data-ka="დაუკავშირდით Google Sheets-ს. გასაღებები ინახება მხოლოდ ამ ბრაუზერში." data-ru="Подключение к Google Sheets. Ключи хранятся только в этом браузере.">დაუკავშირდით Google Sheets-ს. გასაღებები ინახება მხოლოდ ამ ბრაუზერში.</p>
+    <div class="field-group">
+      <label data-ka="რეჟიმი" data-ru="Режим">რეჟიმი</label>
+      <div class="seg" id="modeSeg">
+        <button class="seg-btn" data-mode="admin"><span data-ka="ადმინი" data-ru="Админ">ადმინი</span></button>
+        <button class="seg-btn" data-mode="view"><span data-ka="მხოლოდ ნახვა" data-ru="Просмотр">მხოლოდ ნახვა</span></button>
+      </div>
+      <div class="field-help" data-ka="ნახვის რეჟიმში მონაცემები მხოლოდ იკითხება." data-ru="В режиме просмотра данные только читаются.">ნახვის რეჟიმში მონაცემები მხოლოდ იკითხება.</div>
+    </div>
+    <div class="field-group">
+      <label>API URL</label>
+      <input id="cfgUrl" class="field-input" type="text" placeholder="https://script.google.com/macros/s/.../exec">
+    </div>
+    <div class="field-group">
+      <label>API Key</label>
+      <input id="cfgApiKey" class="field-input" type="password" autocomplete="off">
+    </div>
+    <div class="field-group">
+      <label data-ka="ადმინის გასაღები (ჩაწერისთვის)" data-ru="Ключ администратора (для записи)">ადმინის გასაღები (ჩაწერისთვის)</label>
+      <input id="cfgAdminKey" class="field-input" type="password" autocomplete="off">
+    </div>
+    <div class="field-group">
+      <label data-ka="თქვენი სახელი (ჟურნალისთვის)" data-ru="Ваше имя (для журнала)">თქვენი სახელი (ჟურნალისთვის)</label>
+      <input id="cfgActor" class="field-input" type="text" placeholder="anon">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="testBackend()">
+        <span data-ka="შემოწმება" data-ru="Проверить">შემოწმება</span>
+      </button>
+      <button class="btn btn-ghost" onclick="closeModal('settingsModal')">
+        <span data-ka="გაუქმება" data-ru="Отмена">გაუქმება</span>
+      </button>
+      <button class="btn btn-primary" onclick="saveBackendSettings()">
+        <span data-ka="შენახვა" data-ru="Сохранить">შენახვა</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">₾</div>
+    <div class="logo-text">
+      <div class="company-name">DOMEX GROUP</div>
+      <div class="company-subtitle">Financial Calculator / ფინანსური კალკულატორი</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="mode-pill" id="modePill"><span id="modePillText">ADMIN</span></span>
+    <span class="cloud-pill" id="cloudPill"><span class="cp-dot"></span><span id="cloudPillText">offline</span></span>
+    <button class="icon-btn" onclick="openSettings()" title="Backend settings">⚙</button>
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('ka')">KA</button>
+      <button class="lang-btn" onclick="setLang('ru')">RU</button>
+    </div>
+  </div>
+</header>
+
+<!-- MONTH NAV -->
+<div class="month-nav">
+  <div class="month-nav-inner">
+    <div class="year-ctrl">
+      <button class="year-btn" onclick="changeYear(-1)">◄</button>
+      <span class="year-display" id="yearDisplay">2026</span>
+      <button class="year-btn" onclick="changeYear(1)">►</button>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="month-tabs" id="monthTabs"></div>
+    <div class="nav-divider"></div>
+    <div class="save-ctrl">
+      <button class="btn-save" onclick="saveMonthData()">
+        <span id="save-btn-text">შენახვა</span>
+      </button>
+      <span class="save-status ss-saved" id="save-status">✓ შენახულია</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- CLOSED MONTH BANNER (rendered dynamically) -->
+  <div id="closed-banner-mount"></div>
+
+  <!-- 0. MONTHLY TARGET -->
+  <div class="section-card" id="target-section">
+    <div class="section-header">
+      <div class="section-header-left">
+        <div class="section-icon">◎</div>
+        <span class="section-title-text" data-ka="თვის გეგმა" data-ru="План месяца">თვის გეგმა</span>
+        <span class="section-mini" id="target-mini"></span>
+      </div>
+      <div class="section-header-right">
+        <span class="badge" data-ka="მიზანი" data-ru="Цель">მიზანი</span>
+        <button class="collapse-btn" id="target-toggle" onclick="toggleSection('target')">▾</button>
+      </div>
+    </div>
+    <div class="section-body" id="target-body">
+      <div class="target-wrap">
+        <div>
+          <div class="target-input-row">
+            <label data-ka="მთლიანი მოგების მიზანი (₾)" data-ru="Цель валовой прибыли (₾)">მთლიანი მოგების მიზანი (₾)</label>
+            <input id="targetInput" class="target-input" type="number" min="0" step="0.01" value="" placeholder="0.00" oninput="updateTarget(this.value)">
+          </div>
+          <div style="margin-top:18px">
+            <div class="target-pct-big" id="target-pct">0.00%</div>
+            <div class="target-progress-track"><div class="target-progress-fill" id="target-bar" style="width:0%"></div></div>
+            <div style="margin-top:6px"><span class="target-status-pill" id="target-status">—</span></div>
+          </div>
+        </div>
+        <div class="target-stats">
+          <div class="target-stat-row">
+            <span class="target-stat-label" data-ka="მთლიანი მოგება (მიმდინარე)" data-ru="Валовая прибыль (текущая)">მთლიანი მოგება (მიმდინარე)</span>
+            <span class="target-stat-val" id="target-current">0.00 ₾</span>
+          </div>
+          <div class="target-stat-row">
+            <span class="target-stat-label" data-ka="მიზნის თანხა" data-ru="Сумма цели">მიზნის თანხა</span>
+            <span class="target-stat-val" id="target-amount">0.00 ₾</span>
+          </div>
+          <div class="target-stat-row">
+            <span class="target-stat-label" data-ka="დარჩენილია მიზნამდე" data-ru="Осталось до цели">დარჩენილია მიზნამდე</span>
+            <span class="target-stat-val" id="target-remain">0.00 ₾</span>
+          </div>
+          <div class="formula-hint" style="margin-bottom:0;margin-top:6px">
+            <strong data-ka="ფორმულა:" data-ru="Формула:">ფორმულა:</strong>
+            <span data-ka=" შესრულება % = მთლიანი მოგება ÷ მიზანი × 100. გამოითვლება მხოლოდ მთლიან მოგებაზე." data-ru=" Выполнение % = Валовая прибыль ÷ Цель × 100. Считается только по валовой прибыли."> შესრულება % = მთლიანი მოგება ÷ მიზანი × 100. გამოითვლება მხოლოდ მთლიან მოგებაზე.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. CASH INFLOWS -->
+  <div class="section-card" id="inflows-section">
+    <div class="section-header">
+      <div class="section-header-left">
+        <div class="section-icon">↗</div>
+        <span class="section-title-text" data-ka="ფულადი შემოსავლები" data-ru="Денежные поступления">ფულადი შემოსავლები</span>
+        <span class="section-mini" id="inflows-mini"></span>
+      </div>
+      <div class="section-header-right">
+        <span class="badge" data-ka="შემოსავლები" data-ru="Доходы">შემოსავლები</span>
+        <button class="collapse-btn" id="inflows-toggle" onclick="toggleSection('inflows')">▾</button>
+      </div>
+    </div>
+    <div class="section-body" id="inflows-body">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th data-ka="თარიღი" data-ru="Дата">თარიღი</th>
+            <th data-ka="წყარო / კლიენტი" data-ru="Источник / Клиент">წყარო / კლიენტი</th>
+            <th data-ka="თანხა (₾)" data-ru="Сумма (₾)">თანხა (₾)</th>
+            <th data-ka="კომენტარი" data-ru="Комментарий">კომენტარი</th>
+            <th data-ka="დღგ %" data-ru="НДС %">დღგ %</th>
+            <th data-ka="გადასახ. %" data-ru="Налог %">გადასახ. %</th>
+            <th data-ka="დასაბეგრი" data-ru="Налог.">დასაბეგრი</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="inflowsBody"></tbody>
+        </table>
+      </div>
+      <div class="totals-row">
+        <span class="totals-label" data-ka="სულ შემოსავლები:" data-ru="Итого поступлений:">სულ შემოსავლები:</span>
+        <span class="totals-value" id="totalInflows">0.00 ₾</span>
+      </div>
+    </div>
+    <div class="action-bar" id="inflows-action">
+      <button class="btn btn-primary btn-sm" onclick="addRow('inflows')">
+        + <span data-ka="შემოსავლის დამატება" data-ru="Добавить платёж">შემოსავლის დამატება</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. VAT AND TAX -->
+  <div class="section-card" id="vat-section">
+    <div class="section-header">
+      <div class="section-header-left">
+        <div class="section-icon">%</div>
+        <span class="section-title-text" data-ka="დღგ და გადასახადი" data-ru="НДС и налог">დღგ და გადასახადი</span>
+        <span class="section-mini" id="vat-mini"></span>
+      </div>
+      <div class="section-header-right">
+        <button class="collapse-btn" id="vat-toggle" onclick="toggleSection('vat')">▾</button>
+      </div>
+    </div>
+    <div class="section-body" id="vat-body">
+      <div class="formula-hint">
+        <strong data-ka="ფორმულა:" data-ru="Формула:">ფორმულა:</strong>
+        <span data-ka=" თანხა ÷ (1+დღგ%) = დღგ-ს გარეშე → ×გადასახ.% = გადასახ. | დასაბეგრი=გამორთ. → ნული" data-ru=" Сумма ÷ (1+НДС%) = без НДС → ×налог% = налог | Налог. выкл. → ноль"> თანხა ÷ (1+დღგ%) = დღგ-ს გარეშე → ×გადასახ.% = გადასახ. | დასაბეგრი=გამორთ. → ნული</span>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th data-ka="წყარო / კლიენტი" data-ru="Источник / Клиент">წყარო / კლიენტი</th>
+            <th data-ka="მთლ. თანხა (₾)" data-ru="Сумма брутто (₾)">მთლ. თანხა (₾)</th>
+            <th data-ka="დასაბეგრი" data-ru="Облагается">დასაბეგრი</th>
+            <th data-ka="დღგ %" data-ru="НДС %">დღგ %</th>
+            <th data-ka="დღგ-ს გარეშე (₾)" data-ru="Без НДС (₾)">დღგ-ს გარეშე (₾)</th>
+            <th data-ka="გადასახ. %" data-ru="Налог %">გადასახ. %</th>
+            <th data-ka="გადასახ. თანხა (₾)" data-ru="Сумма налога (₾)">გადასახ. თანხა (₾)</th>
+            <th data-ka="საბოლოო (₾)" data-ru="Итого (₾)">საბოლოო (₾)</th>
+          </tr></thead>
+          <tbody id="vatBody"></tbody>
+        </table>
+      </div>
+      <div class="vat-totals-strip">
+        <div class="vat-strip-item"><div class="vsi-label" data-ka="სულ მთლიანი" data-ru="Итого брутто">სულ მთლიანი</div><div class="vsi-val" id="vst-gross">0.00 ₾</div></div>
+        <div class="vat-strip-item"><div class="vsi-label" data-ka="სულ დღგ-ს გარეშე" data-ru="Итого без НДС">სულ დღგ-ს გარეშე</div><div class="vsi-val" id="vst-noVat">0.00 ₾</div></div>
+        <div class="vat-strip-item"><div class="vsi-label" data-ka="სულ დღგ" data-ru="Итого НДС">სულ დღგ</div><div class="vsi-val" id="vst-vat">0.00 ₾</div></div>
+        <div class="vat-strip-item"><div class="vsi-label" data-ka="სულ გადასახადი" data-ru="Итого налог">სულ გადასახადი</div><div class="vsi-val" id="vst-tax">0.00 ₾</div></div>
+        <div class="vat-strip-item"><div class="vsi-label" data-ka="სულ საბოლოო" data-ru="Итого финал">სულ საბოლოო</div><div class="vsi-val" id="vst-final">0.00 ₾</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. MANAGER COMMISSIONS -->
+  <div class="section-card" id="managers-section">
+    <div class="section-header">
+      <div class="section-header-left">
+        <div class="section-icon">★</div>
+        <span class="section-title-text" data-ka="მენეჯერთა საკომისიოები" data-ru="Комиссии менеджеров">მენეჯერთა საკომისიოები</span>
+        <span class="section-mini" id="managers-mini"></span>
+      </div>
+      <div class="section-header-right">
+        <button class="collapse-btn" id="managers-toggle" onclick="toggleSection('managers')">▾</button>
+      </div>
+    </div>
+    <div class="section-body" id="managers-body">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th data-ka="სახელი" data-ru="Имя">სახელი</th>
+            <th data-ka="პოზიცია" data-ru="Должность">პოზიცია</th>
+            <th data-ka="საბაზო თანხა (₾)" data-ru="Базовая сумма (₾)">საბაზო თანხა (₾)</th>
+            <th data-ka="საკომისიო (%)" data-ru="Комиссия (%)">საკომისიო (%)</th>
+            <th data-ka="ფიქსირ. ბონუსი (₾)" data-ru="Фикс. бонус (₾)">ფიქსირ. ბონუსი (₾)</th>
+            <th data-ka="საბოლოო საკომისიო (₾)" data-ru="Итого комиссия (₾)">საბოლოო საკომისიო (₾)</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="managersBody"></tbody>
+        </table>
+      </div>
+      <div class="totals-row">
+        <span class="totals-label" data-ka="სულ საკომისიოები:" data-ru="Итого комиссий:">სულ საკომისიოები:</span>
+        <span class="totals-value" id="totalCommissions">0.00 ₾</span>
+      </div>
+    </div>
+    <div class="action-bar" id="managers-action">
+      <button class="btn btn-primary btn-sm" onclick="addRow('managers')">
+        + <span data-ka="მენეჯერის დამატება" data-ru="Добавить менеджера">მენეჯერის დამატება</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 4. EMPLOYEE SALARIES -->
+  <div class="section-card" id="salaries-section">
+    <div class="section-header">
+      <div class="section-header-left">
+        <div class="section-icon">👤</div>
+        <span class="section-title-text" data-ka="თანამშრომელთა ხელფასები" data-ru="Зарплаты сотрудников">თანამშრომელთა ხელფასები</span>
+        <span class="section-mini" id="salaries-mini"></span>
+      </div>
+      <div class="section-header-right">
+        <button class="collapse-btn" id="salaries-toggle" onclick="toggleSection('salaries')">▾</button>
+      </div>
+    </div>
+    <div class="section-body" id="salaries-body">
+      <div class="formula-hint">
+        <strong data-ka="ფორმულა:" data-ru="Формула:">ფორმულა:</strong>
+        <span data-ka=" სახელფასო გადასახადი = წმ.ხელფასი × 22% → სრული ხარჯი = ხელფასი + გადასახადი" data-ru=" Налог = чистая з/п × 22% → Полная стоимость = з/п + налог"> სახელფასო გადასახადი = წმ.ხელფასი × 22% → სრული ხარჯი = ხელფასი + გადასახადი</span>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th data-ka="სახელი" data-ru="Имя">სახელი</th>
+            <th data-ka="პოზიცია" data-ru="Должность">პოზიცია</th>
+            <th data-ka="წმ. ხელფასი (₾)" data-ru="Чистая з/п (₾)">წმ. ხელფასი (₾)</th>
+            <th data-ka="სახელფასო გადასახ. 22% (₾)" data-ru="Налог на з/п 22% (₾)">სახელფასო გადასახ. 22% (₾)</th>
+            <th data-ka="სრული ღირებულება (₾)" data-ru="Полная стоимость (₾)">სრული ღირებულება (₾)</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="salariesBody"></tbody>
+        </table>
+      </div>
+      <div class="totals-row">
+        <span class="totals-label" data-ka="სრული სახელფასო ხარჯი:" data-ru="Итого затраты на з/п:">სრული სახელფასო ხარჯი:</span>
+        <span class="totals-value" id="totalSalaries">0.00 ₾</span>
+      </div>
+    </div>
+    <div class="action-bar" id="salaries-action">
+      <button class="btn btn-primary btn-sm" onclick="addRow('salaries')">
+        + <span data-ka="თანამშრომლის დამატება" data-ru="Добавить сотрудника">თანამშრომლის დამატება</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 5. OTHER EXPENSES -->
+  <div class="section-card" id="expenses-section">
+    <div class="section-header">
+      <div class="section-header-left">
+        <div class="section-icon">↙</div>
+        <span class="section-title-text" data-ka="სხვა ხარჯები" data-ru="Прочие расходы">სხვა ხარჯები</span>
+        <span class="section-mini" id="expenses-mini"></span>
+      </div>
+      <div class="section-header-right">
+        <button class="collapse-btn" id="expenses-toggle" onclick="toggleSection('expenses')">▾</button>
+      </div>
+    </div>
+    <div class="section-body" id="expenses-body">
+      <div class="exp-filter-bar" id="exp-filter-bar"></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th data-ka="თარიღი" data-ru="Дата">თარიღი</th>
+            <th data-ka="ხარჯის სახელი" data-ru="Наименование расхода">ხარჯის სახელი</th>
+            <th data-ka="კატეგორია" data-ru="Категория">კატეგორია</th>
+            <th data-ka="თანხა (₾)" data-ru="Сумма (₾)">თანხა (₾)</th>
+            <th data-ka="კომენტარი" data-ru="Комментарий">კომენტარი</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="expensesBody"></tbody>
+        </table>
+      </div>
+      <div class="totals-row">
+        <span class="totals-label" id="expFilteredLabel" data-ka="ნაჩვენები:" data-ru="Показано:">ნაჩვენები:</span>
+        <span class="totals-value" id="expFilteredTotal">0.00 ₾</span>
+        <span class="totals-sep">|</span>
+        <span class="totals-label" data-ka="სულ:" data-ru="Итого:">სულ:</span>
+        <span class="totals-value" id="totalExpenses">0.00 ₾</span>
+      </div>
+      <div class="cat-summary" id="exp-cat-summary"></div>
+    </div>
+    <div class="action-bar" id="expenses-action">
+      <button class="btn btn-primary btn-sm" onclick="addRow('expenses')">
+        + <span data-ka="ხარჯის დამატება" data-ru="Добавить расход">ხარჯის დამატება</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 6. FINAL DASHBOARD -->
+  <div class="section-card" id="dashboard-section">
+    <div class="section-header">
+      <div class="section-header-left">
+        <div class="section-icon">◈</div>
+        <span class="section-title-text" data-ka="საბოლოო დაშბორდი" data-ru="Итоговая панель">საბოლოო დაშბორდი</span>
+        <span class="section-mini" id="dashboard-mini"></span>
+      </div>
+      <div class="section-header-right">
+        <button class="collapse-btn" id="dashboard-toggle" onclick="toggleSection('dashboard')">▾</button>
+      </div>
+    </div>
+    <div class="section-body" id="dashboard-body">
+      <div class="dashboard-grid">
+        <div class="dash-card">
+          <div class="dc-label" data-ka="სულ შემოსავლები" data-ru="Итого поступлений">სულ შემოსავლები</div>
+          <div class="dc-value gold" id="d-totalInflows">0.00 ₾</div>
+          <div class="dc-sub" data-ka="მთლიანი (ბრუტო)" data-ru="Брутто">მთლიანი (ბრუტო)</div>
+        </div>
+        <div class="dash-card">
+          <div class="dc-label" data-ka="შემოსავალი დღგ-ს გარეშე" data-ru="Выручка без НДС">შემოსავალი დღგ-ს გარეშე</div>
+          <div class="dc-value" id="d-revenueNoVat">0.00 ₾</div>
+          <div class="dc-sub" data-ka="დასაბეგრი შემოსავლებიდან" data-ru="Из налогооблагаемых">დასაბეგრი შემოსავლებიდან</div>
+        </div>
+        <div class="dash-card">
+          <div class="dc-label" data-ka="სულ დღგ" data-ru="Итого НДС">სულ დღგ</div>
+          <div class="dc-value red" id="d-vatTotal">0.00 ₾</div>
+          <div class="dc-sub" data-ka="ყველა შემოსავლის დღგ" data-ru="НДС всех поступлений">ყველა შემოსავლის დღგ</div>
+        </div>
+        <div class="dash-card">
+          <div class="dc-label" data-ka="სულ გადასახადი" data-ru="Итого налог">სულ გადასახადი</div>
+          <div class="dc-value red" id="d-taxTotal">0.00 ₾</div>
+          <div class="dc-sub" data-ka="ყველა შემოსავლის გადასახ." data-ru="Налог всех поступлений">ყველა შემოსავლის გადასახ.</div>
+        </div>
+        <div class="dash-card">
+          <div class="dc-label" data-ka="სულ საკომისიოები" data-ru="Итого комиссий">სულ საკომისიოები</div>
+          <div class="dc-value red" id="d-commissions">0.00 ₾</div>
+          <div class="dc-sub" data-ka="მენეჯერთა ჯამი" data-ru="Сумма по менеджерам">მენეჯერთა ჯამი</div>
+        </div>
+        <div class="dash-card">
+          <div class="dc-label" data-ka="სახელფასო ხარჯები" data-ru="Затраты на зарплаты">სახელფასო ხარჯები</div>
+          <div class="dc-value red" id="d-salaries">0.00 ₾</div>
+          <div class="dc-sub" data-ka="ხელფასი + გადასახ." data-ru="з/п + налоги">ხელფასი + გადასახ.</div>
+        </div>
+        <div class="dash-card">
+          <div class="dc-label" data-ka="სხვა ხარჯები (სულ)" data-ru="Прочие расходы (итого)">სხვა ხარჯები (სულ)</div>
+          <div class="dc-value red" id="d-otherExpenses">0.00 ₾</div>
+          <div class="dc-sub" data-ka="ყველა ოპ. ხარჯი" data-ru="Все операц. расходы">ყველა ოპ. ხარჯი</div>
+        </div>
+        <div class="dash-card">
+          <div class="dc-label" data-ka="სულ ხარჯები" data-ru="Итого расходов">სულ ხარჯები</div>
+          <div class="dc-value red" id="d-totalExpenses">0.00 ₾</div>
+          <div class="dc-sub" data-ka="დღგ+გადასახ.+საკომ.+ხელფ.+სხვა" data-ru="НДС+налог+комис.+з/п+прочее">დღგ+გადასახ.+საკომ.+ხელფ.+სხვა</div>
+        </div>
+        <div class="dash-card highlight">
+          <div class="dc-label" data-ka="სუფთა მოგება" data-ru="Чистая прибыль">სუფთა მოგება</div>
+          <div class="dc-value green" id="d-netProfit">0.00 ₾</div>
+          <div class="dc-sub" data-ka="საბოლოო — ოპ. ხარჯები" data-ru="Итог — опер. расходы">საბოლოო — ოპ. ხარჯები</div>
+        </div>
+        <div class="dash-card highlight">
+          <div class="dc-label" data-ka="სუფთა მარჟა" data-ru="Чистая маржа">სუფთა მარჟა</div>
+          <div class="dc-value gold" id="d-margin">0.00%</div>
+          <div class="dc-sub" data-ka="სუფთა მოგება / საბოლოო" data-ru="прибыль / итог">სუფთა მოგება / საბოლოო</div>
+        </div>
+      </div>
+      <div id="corr-log-mount"></div>
+    </div>
+    <div class="action-bar" id="dashboard-action">
+      <button class="btn btn-ghost btn-sm" id="clearAllBtn" onclick="openClearModal()">
+        ✕ <span data-ka="ყველაფრის გასუფთავება" data-ru="Очистить всё">ყველაფრის გასუფთავება</span>
+      </button>
+      <button class="btn btn-sm btn-close-month" id="closeMonthBtn" onclick="requestCloseMonth()">
+        ◉ <span data-ka="თვის დახურვა" data-ru="Закрыть месяц">თვის დახურვა</span>
+      </button>
+      <button class="btn btn-sm btn-edit-closed" id="editClosedBtn" style="display:none" onclick="requestEditClosed()">
+        ✎ <span data-ka="დახურული თვის ჩასწორება" data-ru="Редактировать закрытый месяц">დახურული თვის ჩასწორება</span>
+      </button>
+      <div class="spacer"></div>
+      <button class="btn btn-primary btn-sm" onclick="printReport()">
+        ⎙ <span data-ka="ბეჭდვა / ექსპორტი" data-ru="Печать / Экспорт">ბეჭდვა / ექსპორტი</span>
+      </button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════════════════════════════
+var CATS = [
+  { id:'marketing',  ka:'მარკეტინგი',          ru:'Маркетинг' },
+  { id:'restaurant', ka:'რესტორანი / სტუმრები', ru:'Ресторан / Гости' },
+  { id:'fuel',       ka:'საწვავი',              ru:'Топливо' },
+  { id:'food',       ka:'საკვები',              ru:'Продукты' },
+  { id:'office',     ka:'ოფისი',               ru:'Офис' },
+  { id:'transport',  ka:'ტრანსპორტი',           ru:'Транспорт' },
+  { id:'utilities',  ka:'კომუნალური',           ru:'Коммунальные' },
+  { id:'rent',       ka:'ქირა',                 ru:'Аренда' },
+  { id:'legal',      ka:'იურიდ. / ბუღ.',        ru:'Юрид. / Бухг.' },
+  { id:'other',      ka:'სხვა',                 ru:'Прочее' }
+];
+var CAT_MIGRATE = {
+  'მარკეტინგი':'marketing','marketing':'marketing','маркетинг':'marketing',
+  'რესტორანი':'restaurant','restaurant':'restaurant','ресторан':'restaurant','სტუმრები':'restaurant','гости':'restaurant',
+  'საწვავი':'fuel','fuel':'fuel','топливо':'fuel',
+  'საკვები':'food','food':'food','продукты':'food',
+  'ოფისი':'office','office':'office','офис':'office',
+  'ტრანსპორტი':'transport','transport':'transport','транспорт':'transport',
+  'კომუნალური':'utilities','utilities':'utilities','коммунальные':'utilities',
+  'ქირა':'rent','rent':'rent','аренда':'rent',
+  'იურიდიული':'legal','legal':'legal','бухгалтерия':'legal','юридические':'legal',
+  'სხვა':'other','other':'other','прочее':'other'
+};
+var MONTHS = {
+  ka:['იანვარი','თებერვალი','მარტი','აპრილი','მაისი','ივნისი','ივლისი','აგვისტო','სექტემბერი','ოქტომბერი','ნოემბერი','დეკემბერი'],
+  ru:['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']
+};
+var MONTHS_SHORT = {
+  ka:['იან','თებ','მარ','აპრ','მაი','ივნ','ივლ','აგვ','სექ','ოქტ','ნოე','დეკ'],
+  ru:['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек']
+};
+var T = {
+  ka:{ saved:'✓ შენახულია', dirty:'⚠ შენახული არ არის', cleared:'ყველა მონაცემი წაშლილია',
+       yes:'კი', no:'არა', unknown:'(უცნობი)', noExpFilter:'ფილტრის მიხედვით ხარჯები ვერ მოიძებნა',
+       noExpPeriod:'ამ პერიოდში ხარჯები არ არის', catTitle:'ხარჯები კატეგორიებად', entries:'ჩ.',
+       saveOk:'შენახულია',
+       statusWarn:'ქვემოთ 50%', statusNormal:'მიმდინარეობს', statusSuccess:'მიღწეულია',
+       closedBanner:'თვე დახურულია', closedAt:'დახურვის თარიღი',
+       monthClosed:'თვე წარმატებით დაიხურა', editEnabled:'ჩასწორება დაშვებულია',
+       blockedClose:'თვის დახურვა შესაძლებელია მხოლოდ თვის 1-4 ან 25-31 რიცხვებში.',
+       commentRequired:'გთხოვთ მიუთითოთ მიზეზი, რატომ ხდება დახურული თვის ჩასწორება.',
+       corrLogTitle:'ჩასწორების ისტორია', corrTag:'ჩასწორება',
+       confirmCloseTitle:'თვის დახურვა',
+       confirmCloseText:'თვე დაიხურება და ყველა ცვლილება დაიბლოკება. დარწმუნებული ხართ?' },
+  ru:{ saved:'✓ Сохранено', dirty:'⚠ Не сохранено', cleared:'Все данные удалены',
+       yes:'Да', no:'Нет', unknown:'(не указано)', noExpFilter:'Нет расходов по выбранному фильтру',
+       noExpPeriod:'Нет расходов за выбранный период', catTitle:'Расходы по категориям', entries:'зап.',
+       saveOk:'Сохранено',
+       statusWarn:'ниже 50%', statusNormal:'в процессе', statusSuccess:'достигнуто',
+       closedBanner:'Месяц закрыт', closedAt:'Дата закрытия',
+       monthClosed:'Месяц успешно закрыт', editEnabled:'Редактирование разрешено',
+       blockedClose:'Закрытие месяца возможно только с 1 по 4 или с 25 по 31 число месяца.',
+       commentRequired:'Пожалуйста, укажите причину редактирования закрытого месяца.',
+       corrLogTitle:'История правок', corrTag:'Правка',
+       confirmCloseTitle:'Закрыть месяц',
+       confirmCloseText:'Месяц будет закрыт и все изменения заблокированы. Вы уверены?' }
+};
+
+// ═══════════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════════
+var _now = new Date();
+var state = {
+  lang: 'ka',
+  currentYear:  _now.getFullYear(),
+  currentMonth: _now.getMonth() + 1,
+  // current month's data (loaded per month)
+  inflows:  [],
+  managers: [],
+  salaries: [],
+  expenses: [],
+  target:   '',
+  closed:   false,
+  closedAt: '',
+  corrections: [],
+  // UI prefs
+  collapsed: { target:false, inflows:false, vat:false, managers:false, salaries:false, expenses:false, dashboard:false },
+  expFilter: { cat:'all', view:'month', month:_now.getMonth()+1, year:_now.getFullYear() }
+};
+
+var isDirty = false;
+var pendingAction = null; // function to call after user confirms unsaved changes
+var pendingDelete = null; // { type, id } pending delete confirmation
+
+// ═══════════════════════════════════════════════════════════════════
+//  STORAGE
+// ═══════════════════════════════════════════════════════════════════
+function pad2(n) { return n < 10 ? '0'+n : ''+n; }
+function monthKey(year, month) { return 'domex_data_'+year+'_'+pad2(month); }
+
+// Save ONLY UI preferences (never auto-saves data)
+function saveState() {
+  try {
+    localStorage.setItem('domex_app_state', JSON.stringify({
+      lang:         state.lang,
+      currentYear:  state.currentYear,
+      currentMonth: state.currentMonth,
+      collapsed:    state.collapsed,
+      expFilter:    state.expFilter
+    }));
+  } catch(e) {}
+}
+
+// Manual save — local first (offline-safe), then push to backend if configured
+function saveMonthData(silent) {
+  // 1. Local cache (always — survives offline)
+  try {
+    localStorage.setItem(monthKey(state.currentYear, state.currentMonth), JSON.stringify({
+      inflows:     state.inflows,
+      managers:    state.managers,
+      salaries:    state.salaries,
+      expenses:    state.expenses,
+      target:      state.target,
+      closed:      state.closed,
+      closedAt:    state.closedAt,
+      corrections: state.corrections
+    }));
+    console.log('[DOMEX] local cache saved for '+state.currentYear+'-'+state.currentMonth);
+  } catch(e) {
+    console.error('[DOMEX] localStorage save failed:', e);
+  }
+  isDirty = false;
+  updateSaveStatus();
+  if (!silent) showNotif(T[state.lang].saveOk);
+
+  // 2. Push to backend (Google Sheets) — fail-soft
+  if (!backendCfg.url || !backendCfg.apiKey) {
+    console.warn('[DOMEX] cloud push skipped — backend not configured');
+    if (!silent) setCloudState('offline','no API key');
+    return;
+  }
+  if (backendCfg.mode === 'view') {
+    console.warn('[DOMEX] cloud push skipped — view-only mode');
+    return;
+  }
+  pushMonthToBackend().then(function(){
+    if (!silent) showNotif(state.lang==='ru'?'✓ Сохранено в Google Sheets':'✓ შენახულია Google Sheets-ში');
+  }).catch(function(err){
+    console.error('[DOMEX] cloud push failed:', err.message);
+    isDirty = true; // unsaved on server — keep dirty so autosave retries
+    updateSaveStatus();
+    showNotif((state.lang==='ru'?'⚠ Облако: ':'⚠ ღრუბელი: ')+err.message);
+  });
+}
+
+function loadMonthData(year, month) {
+  var raw = null;
+  try { var s = localStorage.getItem(monthKey(year, month)); if (s) raw = JSON.parse(s); } catch(e) {}
+  state.inflows     = (raw && raw.inflows)     || [];
+  state.managers    = (raw && raw.managers)    || [];
+  state.salaries    = (raw && raw.salaries)    || [];
+  state.expenses    = (raw && raw.expenses)    || [];
+  state.target      = (raw && raw.target!==undefined) ? raw.target : '';
+  state.closed      = !!(raw && raw.closed);
+  state.closedAt    = (raw && raw.closedAt)    || '';
+  state.corrections = (raw && raw.corrections) || [];
+  migrateLoadedData();
+}
+
+function monthHasSavedData(year, month) {
+  try {
+    var s = localStorage.getItem(monthKey(year, month));
+    if (!s) return false;
+    var d = JSON.parse(s);
+    return (d.inflows&&d.inflows.length)||(d.managers&&d.managers.length)||
+           (d.salaries&&d.salaries.length)||(d.expenses&&d.expenses.length)||
+           !!d.closed || (d.target!==undefined && d.target!=='' && d.target!==null);
+  } catch(e) { return false; }
+}
+
+function loadAppState() {
+  try {
+    var s = localStorage.getItem('domex_app_state');
+    if (s) {
+      var p = JSON.parse(s);
+      if (p.lang)         state.lang         = p.lang;
+      if (p.currentYear)  state.currentYear  = p.currentYear;
+      if (p.currentMonth) state.currentMonth = p.currentMonth;
+      if (p.collapsed)    Object.assign(state.collapsed, p.collapsed);
+      if (p.expFilter)    Object.assign(state.expFilter, p.expFilter);
+    }
+  } catch(e) {}
+  migrateFromV3();
+}
+
+// One-time migration from old fin_calc_v3 key
+function migrateFromV3() {
+  // Only if no domex data exists yet
+  var hasDomex = false;
+  try {
+    for (var i=0; i<localStorage.length; i++) {
+      if (localStorage.key(i).indexOf('domex_data_')===0) { hasDomex=true; break; }
+    }
+  } catch(e) {}
+  if (hasDomex) return;
+  try {
+    var old = localStorage.getItem('fin_calc_v3');
+    if (!old) return;
+    var d = JSON.parse(old);
+    if (!d) return;
+    localStorage.setItem(monthKey(state.currentYear, state.currentMonth), JSON.stringify({
+      inflows:  d.inflows  || [],
+      managers: d.managers || [],
+      salaries: d.salaries || [],
+      expenses: d.expenses || []
+    }));
+  } catch(e) {}
+}
+
+function migrateLoadedData() {
+  state.inflows.forEach(function(r) {
+    if (r.vatPct  === undefined) r.vatPct  = 18;
+    if (r.taxPct  === undefined) r.taxPct  = 22;
+    if (r.taxable === undefined) r.taxable = true;
+  });
+  state.expenses.forEach(function(r) {
+    if (!r.date) r.date = '';
+    var validId = CATS.some(function(c) { return c.id === r.category; });
+    if (!validId) {
+      var mapped = CAT_MIGRATE[r.category] || CAT_MIGRATE[(r.category||'').toLowerCase()];
+      r.category = mapped || 'other';
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  DIRTY TRACKING
+// ═══════════════════════════════════════════════════════════════════
+function markDirty() {
+  isDirty = true;
+  updateSaveStatus();
+}
+
+function updateSaveStatus() {
+  var el = document.getElementById('save-status');
+  if (!el) return;
+  var lang = state.lang;
+  if (isDirty) {
+    el.textContent = T[lang].dirty;
+    el.className = 'save-status ss-dirty';
+  } else {
+    el.textContent = T[lang].saved;
+    el.className = 'save-status ss-saved';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  MONTH NAVIGATION
+// ═══════════════════════════════════════════════════════════════════
+function renderMonthNav() {
+  var lang = state.lang;
+  var names = MONTHS_SHORT[lang];
+
+  setText('yearDisplay', state.currentYear);
+
+  var tabsEl = document.getElementById('monthTabs');
+  if (tabsEl) {
+    var html = '';
+    for (var m=1; m<=12; m++) {
+      var isActive  = m === state.currentMonth;
+      var hasData   = monthHasSavedData(state.currentYear, m);
+      var cls = 'month-tab' + (isActive?' m-active':'') + (hasData&&!isActive?' m-has-data':'');
+      html += '<button class="'+cls+'" onclick="switchToMonth('+state.currentYear+','+m+')">' + names[m-1] + '</button>';
+    }
+    tabsEl.innerHTML = html;
+  }
+
+  var saveTxt = document.getElementById('save-btn-text');
+  if (saveTxt) saveTxt.textContent = lang==='ru' ? 'Сохранить' : 'შენახვა';
+
+  updateSaveStatus();
+}
+
+function changeYear(delta) {
+  switchToMonth(state.currentYear + delta, state.currentMonth);
+}
+
+function switchToMonth(year, month) {
+  if (year === state.currentYear && month === state.currentMonth) return;
+  if (isDirty) {
+    pendingAction = function() { doSwitchToMonth(year, month); };
+    openModal('unsavedModal');
+    return;
+  }
+  doSwitchToMonth(year, month);
+}
+
+function doSwitchToMonth(year, month) {
+  state.currentYear  = year;
+  state.currentMonth = month;
+  // Sync expense filter to new period
+  state.expFilter.year  = year;
+  state.expFilter.month = month;
+  state.expFilter.view  = 'month';
+  saveState();
+  loadMonthData(year, month);
+  isDirty = false;
+  renderAll();
+  applyLang();
+  applyAllCollapseStates();
+  // Try to refresh from backend; on failure keep local data
+  if (backendCfg.url && backendCfg.apiKey) {
+    pullMonthFromBackend(year, month).then(function(){
+      renderAll(); applyLang(); applyAllCollapseStates();
+    }).catch(function(){ /* offline — keep local */ });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  MODALS
+// ═══════════════════════════════════════════════════════════════════
+function openModal(id)  { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+function openClearModal() { openModal('clearModal'); }
+function cancelUnsaved()  { pendingAction=null; closeModal('unsavedModal'); }
+function confirmUnsaved() {
+  closeModal('unsavedModal');
+  if (pendingAction) { var fn=pendingAction; pendingAction=null; fn(); }
+}
+function confirmClear() {
+  if (state.closed) { closeModal('clearModal'); return; }
+  state.inflows=[]; state.managers=[]; state.salaries=[]; state.expenses=[];
+  state.target='';
+  markDirty();
+  renderAll();
+  closeModal('clearModal');
+  showNotif(T[state.lang].cleared);
+}
+
+// Close modals on backdrop click
+['clearModal','unsavedModal','deleteModal','closeMonthModal','editClosedModal','settingsModal'].forEach(function(id) {
+  var el = document.getElementById(id); if(!el) return;
+  el.addEventListener('click', function(e) {
+    if (e.target===this) {
+      if (id==='unsavedModal')      cancelUnsaved();
+      else if (id==='deleteModal')  cancelDelete();
+      else closeModal(id);
+    }
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════
+//  DELETE CONFIRMATION
+// ═══════════════════════════════════════════════════════════════════
+function requestDelete(type, id) {
+  if (state.closed) return;
+  pendingDelete = { type:type, id:id };
+  openModal('deleteModal');
+}
+function cancelDelete()  { pendingDelete=null; closeModal('deleteModal'); }
+function confirmDelete() {
+  if (pendingDelete) {
+    var p = pendingDelete; pendingDelete = null;
+    state[p.type] = state[p.type].filter(function(r){ return r.id!==p.id; });
+    markDirty();
+    renderAll();
+  }
+  closeModal('deleteModal');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  MONTH CLOSING
+// ═══════════════════════════════════════════════════════════════════
+function canCloseToday() {
+  var d = new Date().getDate();
+  return (d>=1 && d<=4) || (d>=25 && d<=31);
+}
+function requestCloseMonth() {
+  if (state.closed) return;
+  if (!canCloseToday()) {
+    showNotif(T[state.lang].blockedClose);
+    return;
+  }
+  openModal('closeMonthModal');
+}
+function confirmCloseMonth() {
+  closeModal('closeMonthModal');
+  if (!canCloseToday()) { showNotif(T[state.lang].blockedClose); return; }
+  state.closed   = true;
+  state.closedAt = new Date().toISOString();
+  isDirty = true;
+  saveMonthData(true);
+  showNotif(T[state.lang].monthClosed);
+  renderAll();
+  applyLockState();
+  applyLang();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  EDIT CLOSED MONTH
+// ═══════════════════════════════════════════════════════════════════
+function requestEditClosed() {
+  if (!state.closed) return;
+  var ta = document.getElementById('editClosedComment');
+  if (ta) {
+    ta.value = '';
+    var ph = ta.getAttribute('data-ph-'+state.lang);
+    if (ph) ta.placeholder = ph;
+  }
+  openModal('editClosedModal');
+  setTimeout(function(){ if(ta) ta.focus(); }, 50);
+}
+function confirmEditClosed() {
+  var ta = document.getElementById('editClosedComment');
+  var txt = ta ? ta.value.trim() : '';
+  if (!txt) {
+    showNotif(T[state.lang].commentRequired);
+    if (ta) ta.focus();
+    return;
+  }
+  state.corrections = state.corrections || [];
+  state.corrections.push({
+    at:      new Date().toISOString(),
+    year:    state.currentYear,
+    month:   state.currentMonth,
+    comment: txt
+  });
+  state.closed   = false;
+  state.closedAt = '';
+  isDirty = true;
+  saveMonthData(true);
+  closeModal('editClosedModal');
+  showNotif(T[state.lang].editEnabled);
+  renderAll();
+  applyLockState();
+  applyLang();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  LOCK STATE
+// ═══════════════════════════════════════════════════════════════════
+function applyLockState() {
+  document.body.classList.toggle('is-locked', !!state.closed);
+  var closeBtn = document.getElementById('closeMonthBtn');
+  var editBtn  = document.getElementById('editClosedBtn');
+  var clearBtn = document.getElementById('clearAllBtn');
+  if (closeBtn) closeBtn.style.display = state.closed ? 'none' : '';
+  if (editBtn)  editBtn.style.display  = state.closed ? '' : 'none';
+  if (clearBtn) clearBtn.style.display = state.closed ? 'none' : '';
+  if (closeBtn && !state.closed) {
+    var ok = canCloseToday();
+    closeBtn.disabled = !ok;
+    closeBtn.title    = ok ? '' : T[state.lang].blockedClose;
+  }
+  var ti = document.getElementById('targetInput');
+  if (ti) ti.disabled = !!state.closed;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  LANGUAGE
+// ═══════════════════════════════════════════════════════════════════
+function setLang(lang) {
+  state.lang = lang;
+  saveState();
+  applyLang();
+  renderMonthNav();
+  renderVatTable();
+  renderExpenses();
+  renderClosedBanner();
+  renderCorrectionLog();
+  applyLockState();
+  updateModePill();
+  setCloudState(cloudState);
+}
+
+function applyLang() {
+  var lang = state.lang;
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.textContent.trim().toLowerCase()===lang);
+  });
+  document.querySelectorAll('[data-'+lang+']').forEach(function(el) {
+    var v = el.getAttribute('data-'+lang);
+    if (v!==null) el.textContent = v;
+  });
+  updateSaveStatus();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  BACKEND CONFIG / SYNC
+// ═══════════════════════════════════════════════════════════════════
+var DEFAULT_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbzTJXGC6vHv9sMLFeTT1rpWTK8lp70uDahb0T_VVmv2JD24_XBrYJjGBt5UzfWq46QJUA/exec';
+
+var backendCfg = {
+  url:      DEFAULT_BACKEND_URL,
+  apiKey:   '',
+  adminKey: '',
+  actor:    'anon',
+  mode:     'admin' // 'admin' | 'view'
+};
+
+var cloudState   = 'offline'; // offline | online | syncing | error | view
+var lastSyncAt   = 0;
+var autosaveTmr  = null;
+var bootSyncTmr  = null;
+
+function loadBackendCfg() {
+  try {
+    var s = localStorage.getItem('domex_backend_cfg');
+    if (s) {
+      var p = JSON.parse(s);
+      if (p.url)      backendCfg.url      = p.url;
+      if (p.apiKey)   backendCfg.apiKey   = p.apiKey;
+      if (p.adminKey) backendCfg.adminKey = p.adminKey;
+      if (p.actor)    backendCfg.actor    = p.actor;
+      if (p.mode)     backendCfg.mode     = p.mode;
+    }
+  } catch(e) {}
+}
+function saveBackendCfg() {
+  try { localStorage.setItem('domex_backend_cfg', JSON.stringify(backendCfg)); } catch(e) {}
+}
+
+function setCloudState(s, detail) {
+  cloudState = s;
+  var pill = document.getElementById('cloudPill');
+  var txt  = document.getElementById('cloudPillText');
+  if (!pill) return;
+  pill.className = 'cloud-pill cp-' + s;
+  var labels = {
+    online:  { ka:'ონლაინ',       ru:'онлайн' },
+    syncing: { ka:'სინქრონიზ...',  ru:'синхр...' },
+    saved:   { ka:'შენახულია ☁',  ru:'сохранено ☁' },
+    offline: { ka:'ოფლაინ',       ru:'офлайн' },
+    error:   { ka:'შეცდომა',      ru:'ошибка' },
+    view:    { ka:'მხოლოდ ნახვა',  ru:'просмотр' }
+  };
+  var lbl = labels[s] || { ka:s, ru:s };
+  if (txt) txt.textContent = state.lang==='ru'?lbl.ru:lbl.ka;
+  pill.title = detail || '';
+  // The "saved" state is transient — return to "online" after 2s
+  if (s === 'saved') {
+    clearTimeout(window._cloudFadeT);
+    window._cloudFadeT = setTimeout(function(){
+      if (cloudState === 'saved') setCloudState(backendCfg.mode === 'view' ? 'view' : 'online');
+    }, 2000);
+  }
+}
+
+function updateModePill() {
+  var pill = document.getElementById('modePill');
+  var txt  = document.getElementById('modePillText');
+  if (!pill || !txt) return;
+  if (backendCfg.mode === 'view') {
+    pill.className = 'mode-pill mp-view';
+    txt.textContent = state.lang==='ru' ? 'ПРОСМОТР' : 'ნახვა';
+  } else {
+    pill.className = 'mode-pill';
+    txt.textContent = state.lang==='ru' ? 'АДМИН' : 'ადმინი';
+  }
+}
+
+function applyViewOnlyState() {
+  var on = backendCfg.mode === 'view';
+  document.body.classList.toggle('is-view-only', on);
+  updateModePill();
+  if (on) setCloudState('view');
+}
+
+// API call: POST as application/x-www-form-urlencoded.
+// Critical: Apps Script /exec returns a 302 redirect to googleusercontent.com.
+// Browsers strip request bodies on cross-origin POST redirects when the
+// Content-Type is JSON/text. Form-encoded bodies survive the redirect and
+// land in e.parameter on the server. Nested objects are JSON-stringified;
+// the backend re-parses string params named `data` / `rows`.
+function apiCall(action, params) {
+  if (!backendCfg.url) {
+    console.error('[DOMEX] apiCall blocked: no backend URL');
+    return Promise.reject(new Error('backend URL not set — open ⚙ Settings'));
+  }
+  if (!backendCfg.apiKey) {
+    console.error('[DOMEX] apiCall blocked: no apiKey');
+    return Promise.reject(new Error('API key not set — open ⚙ Settings'));
+  }
+  var body = Object.assign({
+    action:   action,
+    apiKey:   backendCfg.apiKey,
+    adminKey: backendCfg.adminKey || '',
+    mode:     backendCfg.mode,
+    actor:    backendCfg.actor || 'anon'
+  }, params || {});
+
+  var form = new URLSearchParams();
+  Object.keys(body).forEach(function(k){
+    var v = body[k];
+    if (v === undefined || v === null) return;
+    if (typeof v === 'object') v = JSON.stringify(v);
+    form.append(k, String(v));
+  });
+
+  // Logged body — keys redacted, payload truncated
+  var redacted = Object.assign({}, body, {
+    apiKey:   body.apiKey   ? '***'+String(body.apiKey).slice(-3)   : '(none)',
+    adminKey: body.adminKey ? '***'+String(body.adminKey).slice(-3) : '(none)'
+  });
+  if (redacted.data && typeof redacted.data === 'object') {
+    redacted.data = {
+      inflows:     (redacted.data.inflows||[]).length+' rows',
+      expenses:    (redacted.data.expenses||[]).length+' rows',
+      managers:    (redacted.data.managers||[]).length+' rows',
+      salaries:    (redacted.data.salaries||[]).length+' rows',
+      target:      redacted.data.target,
+      closed:      redacted.data.closed,
+      corrections: (redacted.data.corrections||[]).length
+    };
+  }
+  console.log('[DOMEX → backend]', action, redacted);
+
+  var t0 = Date.now();
+  return fetch(backendCfg.url, {
+    method:      'POST',
+    body:        form,
+    redirect:    'follow',
+    credentials: 'omit',
+    cache:       'no-store'
+    // NOTE: no headers — URLSearchParams sets Content-Type to
+    // application/x-www-form-urlencoded automatically. Setting headers
+    // manually here can trigger a CORS preflight that Apps Script rejects.
+  }).then(function(r){
+    var ms = Date.now()-t0;
+    console.log('[DOMEX ← backend]', action, 'HTTP '+r.status, '('+ms+'ms)', 'final URL:', r.url);
+    return r.text().then(function(txt){
+      var j = null;
+      try { j = JSON.parse(txt); }
+      catch(e) {
+        console.error('[DOMEX] non-JSON response for '+action+':', txt.slice(0,600));
+        throw new Error('non-JSON response — Web App must be deployed "Execute as: Me", "Access: Anyone"');
+      }
+      if (!r.ok) {
+        console.error('[DOMEX] HTTP error '+r.status, j);
+        throw new Error('HTTP '+r.status+': '+((j&&j.error&&j.error.message)||'unknown'));
+      }
+      if (!j || j.ok !== true) {
+        console.error('[DOMEX] backend rejected '+action+':', j);
+        throw new Error((j&&j.error&&j.error.message) || 'backend error');
+      }
+      console.log('[DOMEX ✓]', action, j.data);
+      return j.data;
+    });
+  }).catch(function(err){
+    console.error('[DOMEX ✗] '+action+':', err && err.message ? err.message : err);
+    throw err;
+  });
+}
+
+function pingBackend() {
+  if (!backendCfg.apiKey) { setCloudState('offline','no API key'); return; }
+  setCloudState('syncing');
+  apiCall('ping', {}).then(function(){
+    if (backendCfg.mode === 'view') setCloudState('view');
+    else setCloudState('online');
+  }).catch(function(err){
+    setCloudState('offline', err.message);
+  });
+}
+
+function pullMonthFromBackend(year, month) {
+  console.log('[DOMEX] pull month '+year+'-'+month+' from backend');
+  setCloudState('syncing');
+  return apiCall('loadMonthData', { year:year, month:month }).then(function(d){
+    if (!d) return null;
+    state.inflows     = (d.inflows  || []).map(function(r){ return normalizeInflow_(r); });
+    state.expenses    = (d.expenses || []).map(function(r){ return normalizeExpense_(r); });
+    state.salaries    = (d.salaries || d.employees || []).map(function(r){ return normalizeEmployee_(r); });
+    state.managers    = (d.managers || []).map(function(r){ return normalizeManager_(r); });
+    state.target      = d.target!==undefined && d.target!==null ? d.target : '';
+    state.closed      = !!d.closed;
+    state.closedAt    = d.closedAt || '';
+    state.corrections = d.corrections || [];
+    migrateLoadedData();
+    // Cache locally for offline use
+    try {
+      localStorage.setItem(monthKey(year,month), JSON.stringify({
+        inflows:state.inflows, managers:state.managers, salaries:state.salaries,
+        expenses:state.expenses, target:state.target, closed:state.closed,
+        closedAt:state.closedAt, corrections:state.corrections
+      }));
+    } catch(e) {}
+    isDirty = false;
+    if (backendCfg.mode === 'view') setCloudState('view');
+    else setCloudState('online');
+    lastSyncAt = Date.now();
+    console.log('[DOMEX] pulled', year+'-'+month, '— inflows:'+state.inflows.length,
+                'expenses:'+state.expenses.length, 'managers:'+state.managers.length,
+                'salaries:'+state.salaries.length);
+    return d;
+  }).catch(function(err){
+    setCloudState('offline', err.message);
+    throw err;
+  });
+}
+
+function pushMonthToBackend() {
+  if (backendCfg.mode === 'view') {
+    console.warn('[DOMEX] push skipped: view-only mode');
+    return Promise.reject(new Error('view-only mode'));
+  }
+  if (!backendCfg.apiKey) {
+    console.warn('[DOMEX] push skipped: no API key');
+    return Promise.reject(new Error('API key not set'));
+  }
+  if (!backendCfg.adminKey) {
+    console.warn('[DOMEX] push skipped: no admin key — writes require admin key');
+    return Promise.reject(new Error('admin key required for writing (open ⚙ Settings)'));
+  }
+  setCloudState('syncing');
+  console.log('[DOMEX] push month '+state.currentYear+'-'+state.currentMonth+
+              ' — inflows:'+state.inflows.length+
+              ' expenses:'+state.expenses.length+
+              ' managers:'+state.managers.length+
+              ' salaries:'+state.salaries.length+
+              ' target:'+state.target+
+              ' closed:'+state.closed);
+  return apiCall('saveMonthData', {
+    year:  state.currentYear,
+    month: state.currentMonth,
+    data: {
+      inflows:     state.inflows,
+      expenses:    state.expenses,
+      salaries:    state.salaries,
+      managers:    state.managers,
+      target:      state.target,
+      closed:      state.closed,
+      closedAt:    state.closedAt,
+      corrections: state.corrections
+    }
+  }).then(function(res){
+    lastSyncAt = Date.now();
+    setCloudState('saved');
+    console.log('[DOMEX] push OK — server wrote:', res && res.written);
+    return res;
+  }).catch(function(err){
+    setCloudState('error', err.message);
+    throw err;
+  });
+}
+
+// Yearly summary (read-only aggregate from sheets)
+function loadYearlySummary(year) {
+  return apiCall('loadYearlySummary', { year: year }).then(function(d){
+    console.log('[DOMEX] yearly summary', year, d);
+    return d;
+  });
+}
+
+function normalizeInflow_(r) {
+  return { id:r.id||uid(), date:r.date||'', source:r.source||'',
+           amount:r.amount===''||r.amount==null?'':r.amount, comment:r.comment||'',
+           vatPct:r.vatPct===''||r.vatPct==null?18:r.vatPct,
+           taxPct:r.taxPct===''||r.taxPct==null?22:r.taxPct,
+           taxable:r.taxable===false?false:true };
+}
+function normalizeExpense_(r) {
+  return { id:r.id||uid(), date:r.date||'', name:r.name||'', category:r.category||'',
+           amount:r.amount===''||r.amount==null?'':r.amount, comment:r.comment||'' };
+}
+function normalizeEmployee_(r) {
+  return { id:r.id||uid(), name:r.name||'', position:r.position||'',
+           net:r.net===''||r.net==null?'':r.net };
+}
+function normalizeManager_(r) {
+  return { id:r.id||uid(), name:r.name||'', position:r.position||'',
+           base:r.base===''||r.base==null?'':r.base,
+           pct:r.pct===''||r.pct==null?'':r.pct,
+           bonus:r.bonus===''||r.bonus==null?'':r.bonus };
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  AUTOSAVE
+// ═══════════════════════════════════════════════════════════════════
+function startAutosave() {
+  if (autosaveTmr) clearInterval(autosaveTmr);
+  autosaveTmr = setInterval(function(){
+    if (!isDirty) return;
+    if (backendCfg.mode === 'view') return;
+    if (state.closed) return;
+    saveMonthData(true);
+  }, 30000);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  SETTINGS MODAL
+// ═══════════════════════════════════════════════════════════════════
+function openSettings() {
+  document.getElementById('cfgUrl').value      = backendCfg.url;
+  document.getElementById('cfgApiKey').value   = backendCfg.apiKey;
+  document.getElementById('cfgAdminKey').value = backendCfg.adminKey;
+  document.getElementById('cfgActor').value    = backendCfg.actor;
+  var seg = document.getElementById('modeSeg');
+  if (seg) {
+    seg.querySelectorAll('.seg-btn').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-mode')===backendCfg.mode);
+      b.onclick = function(){
+        seg.querySelectorAll('.seg-btn').forEach(function(x){ x.classList.remove('active'); });
+        b.classList.add('active');
+      };
+    });
+  }
+  openModal('settingsModal');
+}
+function saveBackendSettings() {
+  var seg = document.getElementById('modeSeg');
+  var newMode = 'admin';
+  if (seg) {
+    var act = seg.querySelector('.seg-btn.active');
+    if (act) newMode = act.getAttribute('data-mode') || 'admin';
+  }
+  backendCfg.url      = (document.getElementById('cfgUrl').value || '').trim() || DEFAULT_BACKEND_URL;
+  backendCfg.apiKey   = (document.getElementById('cfgApiKey').value || '').trim();
+  backendCfg.adminKey = (document.getElementById('cfgAdminKey').value || '').trim();
+  backendCfg.actor    = (document.getElementById('cfgActor').value || '').trim() || 'anon';
+  backendCfg.mode     = newMode;
+  saveBackendCfg();
+  closeModal('settingsModal');
+  applyViewOnlyState();
+  pingBackend();
+  // Try to pull current month from backend
+  if (backendCfg.apiKey) {
+    pullMonthFromBackend(state.currentYear, state.currentMonth).then(function(){
+      renderAll(); applyLang(); applyAllCollapseStates();
+      showNotif(state.lang==='ru'?'Подключено':'დაკავშირებულია');
+    }).catch(function(err){
+      showNotif((state.lang==='ru'?'Ошибка: ':'შეცდომა: ')+err.message);
+    });
+  }
+}
+function testBackend() {
+  var url = (document.getElementById('cfgUrl').value || '').trim();
+  var key = (document.getElementById('cfgApiKey').value || '').trim();
+  var adm = (document.getElementById('cfgAdminKey').value || '').trim();
+  if (!url || !key) {
+    showNotif(state.lang==='ru'?'Введите URL и ключ':'შეიყვანეთ URL და გასაღები');
+    return;
+  }
+  console.log('[DOMEX] testBackend → '+url);
+  var form = new URLSearchParams();
+  form.append('action','ping');
+  form.append('apiKey', key);
+  form.append('adminKey', adm);
+  form.append('mode', adm ? 'admin' : 'view');
+  fetch(url, {
+    method:'POST',
+    body: form,
+    redirect:'follow',
+    credentials:'omit',
+    cache:'no-store'
+  }).then(function(r){
+    console.log('[DOMEX] test HTTP '+r.status, 'final URL:', r.url);
+    return r.text().then(function(txt){
+      var j = null; try { j = JSON.parse(txt); } catch(e) {
+        console.error('[DOMEX] test non-JSON:', txt.slice(0,400));
+        showNotif(state.lang==='ru'?'Ошибка: не JSON-ответ':'შეცდომა: არასწორი პასუხი'); return;
+      }
+      console.log('[DOMEX] test response:', j);
+      if (j && j.ok) {
+        showNotif((state.lang==='ru'?'✓ Подключение работает — режим: ':'✓ კავშირი მუშაობს — რეჟიმი: ')+(j.data&&j.data.mode||'?'));
+      } else {
+        showNotif((state.lang==='ru'?'Ошибка: ':'შეცდომა: ')+((j&&j.error&&j.error.message)||'unknown'));
+      }
+    });
+  }).catch(function(err){
+    console.error('[DOMEX] test failed:', err);
+    showNotif((state.lang==='ru'?'Ошибка: ':'შეცდომა: ')+err.message);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════════════════
+function fmt(n) {
+  n = parseFloat(n)||0;
+  return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' ₾';
+}
+function fmtPct(n)  { return (parseFloat(n)||0).toFixed(2)+'%'; }
+function setText(id,v) { var el=document.getElementById(id); if(el) el.textContent=v; }
+function esc(v) {
+  return String(v===null||v===undefined?'':v)
+    .replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function uid()      { return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function todayStr() { return new Date().toISOString().slice(0,10); }
+
+function getCatLabel(id) {
+  var c = CATS.find(function(x){ return x.id===id; });
+  return c ? (c[state.lang]||c.ka) : (id||'სხვა');
+}
+function catOptions(selectedId) {
+  var lang=state.lang, ph=lang==='ru'?'— выберите —':'— აირჩიეთ —';
+  var h='<option value="">'+ph+'</option>';
+  CATS.forEach(function(c){ h+='<option value="'+c.id+'"'+(selectedId===c.id?' selected':'')+'>'+c[lang]+'</option>'; });
+  return h;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  COLLAPSIBLE
+// ═══════════════════════════════════════════════════════════════════
+function toggleSection(name) {
+  state.collapsed[name] = !state.collapsed[name];
+  saveState();
+  applySectionCollapse(name);
+}
+function applySectionCollapse(name) {
+  var c = state.collapsed[name];
+  var body   = document.getElementById(name+'-body');
+  var action = document.getElementById(name+'-action');
+  var toggle = document.getElementById(name+'-toggle');
+  var mini   = document.getElementById(name+'-mini');
+  if (body)   body.classList.toggle('collapsed', c);
+  if (action) action.classList.toggle('collapsed', c);
+  if (toggle) toggle.textContent = c ? '▸' : '▾';
+  if (mini)   mini.style.display = c ? 'inline' : 'none';
+}
+function applyAllCollapseStates() {
+  ['target','inflows','vat','managers','salaries','expenses','dashboard'].forEach(applySectionCollapse);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  TARGET
+// ═══════════════════════════════════════════════════════════════════
+function updateTarget(v) {
+  if (state.closed) { renderTargetInput(); return; }
+  state.target = v;
+  markDirty();
+  recalc();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  PER-INFLOW CALC
+// ═══════════════════════════════════════════════════════════════════
+function calcInflow(row) {
+  var amount = parseFloat(row.amount)||0;
+  var taxable = row.taxable!==false;
+  if (!taxable) return {amount:amount,revenueNoVat:amount,vatAmt:0,taxAmt:0,final:amount};
+  var vp=parseFloat(row.vatPct); if(isNaN(vp)) vp=18;
+  var tp=parseFloat(row.taxPct); if(isNaN(tp)) tp=22;
+  var div=1+vp/100;
+  var noVat=div!==0?amount/div:amount;
+  var vatAmt=amount-noVat, taxAmt=noVat*(tp/100);
+  return {amount:amount,revenueNoVat:noVat,vatAmt:vatAmt,taxAmt:taxAmt,final:noVat-taxAmt};
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  EXPENSE FILTERING
+// ═══════════════════════════════════════════════════════════════════
+function expMatchesPeriod(r) {
+  var f=state.expFilter;
+  if (!r.date) return true;
+  var d=new Date(r.date); if(isNaN(d.getTime())) return true;
+  var ry=d.getFullYear(), rm=d.getMonth()+1;
+  if (f.view==='month') return ry===f.year && rm===f.month;
+  if (f.view==='year')  return ry===f.year;
+  return true;
+}
+function getFilteredExpenses() {
+  var f=state.expFilter;
+  return state.expenses.filter(function(r) {
+    if (f.cat!=='all' && r.category!==f.cat) return false;
+    return expMatchesPeriod(r);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  ADD / DELETE
+// ═══════════════════════════════════════════════════════════════════
+function addRow(type) {
+  if (state.closed) return;
+  var id=uid(), r;
+  if      (type==='inflows')  r={id:id,date:todayStr(),source:'',amount:'',comment:'',vatPct:18,taxPct:22,taxable:true};
+  else if (type==='managers') r={id:id,name:'',position:'',base:'',pct:'',bonus:''};
+  else if (type==='salaries') r={id:id,name:'',position:'',net:''};
+  else if (type==='expenses') r={id:id,date:todayStr(),name:'',category:'',amount:'',comment:''};
+  state[type].push(r);
+  if (state.collapsed[type]) { state.collapsed[type]=false; saveState(); applySectionCollapse(type); }
+  markDirty();
+  renderAll();
+  setTimeout(function() {
+    var tb=document.getElementById(type+'Body'); if(!tb) return;
+    var rows=tb.querySelectorAll('tr'); var last=rows[rows.length-1];
+    if (last) { var inp=last.querySelector('.tbl-input'); if(inp) inp.focus(); }
+  }, 50);
+}
+
+function delRow(type, id) {
+  // All deletes now route through confirmation modal
+  requestDelete(type, id);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  UPDATE FIELD
+// ═══════════════════════════════════════════════════════════════════
+function updateField(type, id, field, value) {
+  if (state.closed) return;
+  var row=state[type].find(function(r){ return r.id===id; });
+  if (!row) return;
+  row[field]=value;
+  markDirty();
+  recalc();
+  refreshReadonly(type, id);
+}
+function updateExpCategory(id, value) {
+  updateField('expenses', id, 'category', value);
+  renderExpenses();
+}
+function refreshReadonly(type, id) {
+  if (type==='managers') {
+    var r=state.managers.find(function(x){ return x.id===id; }); if(!r) return;
+    var fin=(parseFloat(r.base)||0)*((parseFloat(r.pct)||0)/100)+(parseFloat(r.bonus)||0);
+    var el=document.querySelector('[data-rowid="'+id+'"][data-field="final"]'); if(el) el.value=fin.toFixed(2);
+  } else if (type==='salaries') {
+    var r=state.salaries.find(function(x){ return x.id===id; }); if(!r) return;
+    var net=parseFloat(r.net)||0, t=net*0.22;
+    var taxEl=document.querySelector('[data-rowid="'+id+'"][data-field="taxAmt"]');
+    var totEl=document.querySelector('[data-rowid="'+id+'"][data-field="total"]');
+    if(taxEl) taxEl.value=t.toFixed(2); if(totEl) totEl.value=(net+t).toFixed(2);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  RENDER ALL
+// ═══════════════════════════════════════════════════════════════════
+function renderAll() {
+  renderMonthNav();
+  renderClosedBanner();
+  renderTargetInput();
+  renderInflows();
+  renderManagers();
+  renderSalaries();
+  renderExpenses();
+  renderCorrectionLog();
+  recalc();
+  applyLockState();
+}
+
+function renderTargetInput() {
+  var ti = document.getElementById('targetInput');
+  if (ti) ti.value = (state.target===''||state.target===null||state.target===undefined) ? '' : state.target;
+}
+
+function renderClosedBanner() {
+  var mount = document.getElementById('closed-banner-mount'); if(!mount) return;
+  if (!state.closed) { mount.innerHTML=''; return; }
+  var lang = state.lang;
+  var when = '';
+  if (state.closedAt) {
+    try {
+      var d = new Date(state.closedAt);
+      when = d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())+' '+pad2(d.getHours())+':'+pad2(d.getMinutes());
+    } catch(e) {}
+  }
+  var monthName = MONTHS[lang][state.currentMonth-1]+' '+state.currentYear;
+  mount.innerHTML =
+    '<div class="closed-banner">' +
+      '<div class="closed-banner-icon">●</div>' +
+      '<div class="closed-banner-text"><b>'+T[lang].closedBanner+'</b> — '+monthName+'</div>' +
+      (when ? '<div class="closed-banner-meta">'+T[lang].closedAt+': '+when+'</div>' : '') +
+    '</div>';
+}
+
+function renderCorrectionLog() {
+  var mount = document.getElementById('corr-log-mount'); if(!mount) return;
+  var lang = state.lang;
+  var list = state.corrections || [];
+  if (!list.length) { mount.innerHTML=''; return; }
+  var html = '<div class="corr-log"><div class="corr-log-title">'+T[lang].corrLogTitle+' ('+list.length+')</div><div class="corr-list">';
+  list.slice().sort(function(a,b){ return (b.at||'').localeCompare(a.at||''); }).forEach(function(c) {
+    var when = '';
+    try {
+      var d = new Date(c.at);
+      when = d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())+' '+pad2(d.getHours())+':'+pad2(d.getMinutes());
+    } catch(e) { when = c.at||''; }
+    html += '<div class="corr-item">' +
+              '<div class="corr-item-head">' +
+                '<span class="corr-item-when">'+esc(when)+' · '+c.year+'-'+pad2(c.month)+'</span>' +
+                '<span class="corr-item-tag">'+T[lang].corrTag+'</span>' +
+              '</div>' +
+              '<div class="corr-item-text">'+esc(c.comment)+'</div>' +
+            '</div>';
+  });
+  html += '</div></div>';
+  mount.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  RENDER INFLOWS
+// ═══════════════════════════════════════════════════════════════════
+function renderInflows() {
+  var tbody=document.getElementById('inflowsBody'); if(!tbody) return;
+  var html='';
+  state.inflows.forEach(function(row) {
+    var vp=row.vatPct===undefined?18:row.vatPct, tp=row.taxPct===undefined?22:row.taxPct;
+    var taxable=row.taxable!==false, id=row.id;
+    html+='<tr>';
+    html+='<td><input class="tbl-input" type="date" value="'+esc(row.date)+'" oninput="updateField(\'inflows\',\''+id+'\',\'date\',this.value)" style="min-width:120px"></td>';
+    html+='<td><input class="tbl-input" type="text" value="'+esc(row.source)+'" oninput="updateField(\'inflows\',\''+id+'\',\'source\',this.value)" style="min-width:125px"></td>';
+    html+='<td><input class="tbl-input" type="number" value="'+esc(row.amount)+'" min="0" step="0.01" oninput="updateField(\'inflows\',\''+id+'\',\'amount\',this.value)" style="min-width:100px"></td>';
+    html+='<td><input class="tbl-input" type="text" value="'+esc(row.comment)+'" oninput="updateField(\'inflows\',\''+id+'\',\'comment\',this.value)" style="min-width:110px"></td>';
+    html+='<td><input class="tbl-input" type="number" value="'+esc(vp)+'" min="0" max="100" step="0.1" oninput="updateField(\'inflows\',\''+id+'\',\'vatPct\',parseFloat(this.value)||0)" style="min-width:65px"'+(taxable?'':' disabled')+'></td>';
+    html+='<td><input class="tbl-input" type="number" value="'+esc(tp)+'" min="0" max="100" step="0.1" oninput="updateField(\'inflows\',\''+id+'\',\'taxPct\',parseFloat(this.value)||0)" style="min-width:65px"'+(taxable?'':' disabled')+'></td>';
+    html+='<td class="toggle-wrap"><label class="toggle"><input type="checkbox" '+(taxable?'checked':'')+' onchange="updateField(\'inflows\',\''+id+'\',\'taxable\',this.checked);renderInflows()"><span class="toggle-slider"></span></label></td>';
+    html+='<td><button class="del-btn" onclick="delRow(\'inflows\',\''+id+'\')">✕</button></td>';
+    html+='</tr>';
+  });
+  tbody.innerHTML=html;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  RENDER VAT TABLE
+// ═══════════════════════════════════════════════════════════════════
+function renderVatTable() {
+  var tbody=document.getElementById('vatBody'); if(!tbody) return;
+  var lang=state.lang;
+  if (!state.inflows.length) {
+    tbody.innerHTML='<tr><td colspan="8" class="empty-state">'+(lang==='ru'?'Нет данных. Добавьте поступления.':'მონაცემი არ არის. დაამატეთ შემოსავლები.')+'</td></tr>';
+    return;
+  }
+  var html='';
+  state.inflows.forEach(function(row) {
+    var c=calcInflow(row), taxable=row.taxable!==false;
+    var vp=taxable?(parseFloat(row.vatPct)||0):0, tp=taxable?(parseFloat(row.taxPct)||0):0;
+    var src=esc(row.source)||(lang==='ru'?T.ru.unknown:T.ka.unknown);
+    var lbl=taxable?(lang==='ru'?T.ru.yes:T.ka.yes):(lang==='ru'?T.ru.no:T.ka.no);
+    html+='<tr>';
+    html+='<td>'+src+'</td>';
+    html+='<td class="ro">'+fmt(c.amount)+'</td>';
+    html+='<td style="'+(taxable?'color:var(--green)':'color:var(--text3)')+';font-size:12px;font-weight:600">'+lbl+'</td>';
+    html+='<td class="ro-dim">'+(taxable?vp+'%':'—')+'</td>';
+    html+='<td class="ro">'+fmt(c.revenueNoVat)+'</td>';
+    html+='<td class="ro-dim">'+(taxable?tp+'%':'—')+'</td>';
+    html+='<td class="ro-red">'+fmt(c.taxAmt)+'</td>';
+    html+='<td class="ro" style="font-weight:700">'+fmt(c.final)+'</td>';
+    html+='</tr>';
+  });
+  tbody.innerHTML=html;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  RENDER MANAGERS
+// ═══════════════════════════════════════════════════════════════════
+function renderManagers() {
+  var tbody=document.getElementById('managersBody'); if(!tbody) return;
+  var html='';
+  state.managers.forEach(function(row) {
+    var base=parseFloat(row.base)||0,pct=parseFloat(row.pct)||0,bonus=parseFloat(row.bonus)||0;
+    var fin=base*(pct/100)+bonus, id=row.id;
+    html+='<tr>';
+    html+='<td><input class="tbl-input" type="text" value="'+esc(row.name)+'" oninput="updateField(\'managers\',\''+id+'\',\'name\',this.value)" style="min-width:110px"></td>';
+    html+='<td><input class="tbl-input" type="text" value="'+esc(row.position)+'" oninput="updateField(\'managers\',\''+id+'\',\'position\',this.value)" style="min-width:110px"></td>';
+    html+='<td><input class="tbl-input" type="number" value="'+esc(row.base)+'" min="0" step="0.01" oninput="updateField(\'managers\',\''+id+'\',\'base\',this.value)" data-rowid="'+id+'" style="min-width:100px"></td>';
+    html+='<td><input class="tbl-input" type="number" value="'+esc(row.pct)+'" min="0" max="100" step="0.1" oninput="updateField(\'managers\',\''+id+'\',\'pct\',this.value)" data-rowid="'+id+'" style="min-width:82px"></td>';
+    html+='<td><input class="tbl-input" type="number" value="'+esc(row.bonus)+'" min="0" step="0.01" oninput="updateField(\'managers\',\''+id+'\',\'bonus\',this.value)" data-rowid="'+id+'" style="min-width:100px"></td>';
+    html+='<td><input class="tbl-input" type="number" value="'+fin.toFixed(2)+'" readonly data-rowid="'+id+'" data-field="final" style="min-width:110px"></td>';
+    html+='<td><button class="del-btn" onclick="delRow(\'managers\',\''+id+'\')">✕</button></td>';
+    html+='</tr>';
+  });
+  tbody.innerHTML=html;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  RENDER SALARIES
+// ═══════════════════════════════════════════════════════════════════
+function renderSalaries() {
+  var tbody=document.getElementById('salariesBody'); if(!tbody) return;
+  var html='';
+  state.salaries.forEach(function(row) {
+    var net=parseFloat(row.net)||0, t=net*0.22, id=row.id;
+    html+='<tr>';
+    html+='<td><input class="tbl-input" type="text" value="'+esc(row.name)+'" oninput="updateField(\'salaries\',\''+id+'\',\'name\',this.value)" style="min-width:120px"></td>';
+    html+='<td><input class="tbl-input" type="text" value="'+esc(row.position)+'" oninput="updateField(\'salaries\',\''+id+'\',\'position\',this.value)" style="min-width:120px"></td>';
+    html+='<td><input class="tbl-input" type="number" value="'+esc(row.net)+'" min="0" step="0.01" oninput="updateField(\'salaries\',\''+id+'\',\'net\',this.value)" data-rowid="'+id+'" style="min-width:110px"></td>';
+    html+='<td><input class="tbl-input" type="number" value="'+t.toFixed(2)+'" readonly data-rowid="'+id+'" data-field="taxAmt" style="min-width:130px"></td>';
+    html+='<td><input class="tbl-input" type="number" value="'+(net+t).toFixed(2)+'" readonly data-rowid="'+id+'" data-field="total" style="min-width:130px"></td>';
+    html+='<td><button class="del-btn" onclick="delRow(\'salaries\',\''+id+'\')">✕</button></td>';
+    html+='</tr>';
+  });
+  tbody.innerHTML=html;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  RENDER EXPENSES
+// ═══════════════════════════════════════════════════════════════════
+function renderExpenses() {
+  renderExpFilterBar();
+  renderExpTable();
+  renderCatSummary();
+}
+
+function renderExpFilterBar() {
+  var el=document.getElementById('exp-filter-bar'); if(!el) return;
+  var lang=state.lang, f=state.expFilter;
+  var html='<div class="period-row">';
+  html+='<div class="period-tabs">';
+  html+='<button class="period-tab'+(f.view==='month'?' active':'')+'" onclick="setExpView(\'month\')">'+(lang==='ru'?'Месяц':'თვე')+'</button>';
+  html+='<button class="period-tab'+(f.view==='year'?' active':'')+'" onclick="setExpView(\'year\')">'+(lang==='ru'?'Год':'წელი')+'</button>';
+  html+='</div>';
+  if (f.view==='month') {
+    html+='<select class="period-select" onchange="setExpMonth(parseInt(this.value))">';
+    MONTHS[lang].forEach(function(n,i){ html+='<option value="'+(i+1)+'"'+((i+1)===f.month?' selected':'')+'>'+n+'</option>'; });
+    html+='</select>';
+  }
+  var cy=new Date().getFullYear();
+  html+='<select class="period-select" onchange="setExpYear(parseInt(this.value))">';
+  for (var y=cy-3;y<=cy+1;y++) html+='<option value="'+y+'"'+(y===f.year?' selected':'')+'>'+y+'</option>';
+  html+='</select></div>';
+  html+='<div class="filter-chips-row">';
+  html+='<button class="filter-chip'+(f.cat==='all'?' active':'')+'" onclick="setExpCat(\'all\')">'+(lang==='ru'?'Все':'ყველა')+'</button>';
+  CATS.forEach(function(c){ html+='<button class="filter-chip'+(f.cat===c.id?' active':'')+'" onclick="setExpCat(\''+c.id+'\')">'+(c[lang]||c.ka)+'</button>'; });
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+function renderExpTable() {
+  var tbody=document.getElementById('expensesBody'); if(!tbody) return;
+  var lang=state.lang, filtered=getFilteredExpenses();
+  var html='';
+  if (!filtered.length) {
+    var msg=state.expenses.length===0
+      ?(lang==='ru'?'Нет расходов. Нажмите «Добавить расход».':'ხარჯები არ არის. დააჭირეთ «ხარჯის დამატება».')
+      :(lang==='ru'?T.ru.noExpFilter:T.ka.noExpFilter);
+    html='<tr><td colspan="6" class="empty-state">'+msg+'</td></tr>';
+  } else {
+    filtered.forEach(function(row) {
+      var id=row.id;
+      html+='<tr>';
+      html+='<td><input class="tbl-input" type="date" value="'+esc(row.date||'')+'" oninput="updateField(\'expenses\',\''+id+'\',\'date\',this.value)" style="min-width:118px"></td>';
+      html+='<td><input class="tbl-input" type="text" value="'+esc(row.name)+'" oninput="updateField(\'expenses\',\''+id+'\',\'name\',this.value)" style="min-width:118px"></td>';
+      html+='<td><select class="tbl-input tbl-select" onchange="updateExpCategory(\''+id+'\',this.value)" style="min-width:150px">'+catOptions(row.category)+'</select></td>';
+      html+='<td><input class="tbl-input" type="number" value="'+esc(row.amount)+'" min="0" step="0.01" oninput="updateField(\'expenses\',\''+id+'\',\'amount\',this.value)" style="min-width:98px"></td>';
+      html+='<td><input class="tbl-input" type="text" value="'+esc(row.comment)+'" oninput="updateField(\'expenses\',\''+id+'\',\'comment\',this.value)" style="min-width:110px"></td>';
+      html+='<td><button class="del-btn" onclick="delRow(\'expenses\',\''+id+'\')">✕</button></td>';
+      html+='</tr>';
+    });
+  }
+  tbody.innerHTML=html;
+  var filtTotal=filtered.reduce(function(s,r){ return s+(parseFloat(r.amount)||0); },0);
+  setText('expFilteredTotal', fmt(filtTotal));
+}
+
+function renderCatSummary() {
+  var el=document.getElementById('exp-cat-summary'); if(!el) return;
+  var lang=state.lang, f=state.expFilter;
+  var periodExp=state.expenses.filter(expMatchesPeriod);
+  if (!periodExp.length) {
+    el.innerHTML='<div style="padding:14px 0 0;color:var(--text3);font-size:12px">'+(lang==='ru'?T.ru.noExpPeriod:T.ka.noExpPeriod)+'</div>';
+    return;
+  }
+  var totals={}, grand=0;
+  periodExp.forEach(function(r) {
+    var cat=r.category||'other', amt=parseFloat(r.amount)||0;
+    if(!totals[cat]) totals[cat]={amount:0,count:0};
+    totals[cat].amount+=amt; totals[cat].count++; grand+=amt;
+  });
+  var periodLabel=f.view==='month'?MONTHS[lang][f.month-1]+' '+f.year:f.year.toString();
+  var html='<div class="cat-summary-header"><div class="cat-summary-title">'+(lang==='ru'?T.ru.catTitle:T.ka.catTitle)+'</div>';
+  html+='<div class="cat-summary-period">'+periodLabel+'</div></div>';
+  html+='<div class="cat-summary-grid">';
+  Object.keys(totals).sort(function(a,b){ return totals[b].amount-totals[a].amount; }).forEach(function(catId) {
+    var d=totals[catId], isAct=f.cat===catId;
+    var pct=grand>0?(d.amount/grand*100):0;
+    html+='<div class="cat-card'+(isAct?' cat-active':'')+'" onclick="setExpCat(\''+(isAct?'all':catId)+'\')">';
+    html+='<div class="cc-label">'+esc(getCatLabel(catId))+'</div>';
+    html+='<div class="cc-amount">'+fmt(d.amount)+'</div>';
+    html+='<div class="cc-bar"><div class="cc-bar-fill" style="width:'+pct.toFixed(1)+'%"></div></div>';
+    html+='<div class="cc-meta"><span>'+pct.toFixed(1)+'%</span><span>'+d.count+' '+(lang==='ru'?T.ru.entries:T.ka.entries)+'</span></div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+// Expense filter setters (UI pref — save state, no dirty mark)
+function setExpCat(cat)  { state.expFilter.cat=cat;  saveState(); renderExpenses(); }
+function setExpView(v)   { state.expFilter.view=v;   saveState(); renderExpenses(); recalc(); }
+function setExpMonth(m)  { state.expFilter.month=m;  saveState(); renderExpenses(); recalc(); }
+function setExpYear(y)   { state.expFilter.year=y;   saveState(); renderExpenses(); recalc(); }
+
+// ═══════════════════════════════════════════════════════════════════
+//  RECALCULATE
+// ═══════════════════════════════════════════════════════════════════
+function recalc() {
+  var totalGross=0,totalNoVat=0,totalVat=0,totalTax=0,totalFinal=0;
+  state.inflows.forEach(function(r) {
+    var c=calcInflow(r);
+    totalGross+=c.amount; totalNoVat+=c.revenueNoVat;
+    totalVat+=c.vatAmt;   totalTax+=c.taxAmt; totalFinal+=c.final;
+  });
+  var totalComm=0;
+  state.managers.forEach(function(r){ totalComm+=(parseFloat(r.base)||0)*((parseFloat(r.pct)||0)/100)+(parseFloat(r.bonus)||0); });
+  var totalSal=0;
+  state.salaries.forEach(function(r){ var net=parseFloat(r.net)||0; totalSal+=net+net*0.22; });
+  var totalOther=0;
+  state.expenses.forEach(function(r){ totalOther+=parseFloat(r.amount)||0; });
+  var filtTotal=getFilteredExpenses().reduce(function(s,r){ return s+(parseFloat(r.amount)||0); },0);
+  var totalAllExp=totalVat+totalTax+totalComm+totalSal+totalOther;
+  var netProfit=totalFinal-totalComm-totalSal-totalOther;
+  var margin=totalFinal>0?(netProfit/totalFinal)*100:0;
+
+  setText('totalInflows',     fmt(totalGross));  setText('inflows-mini',    fmt(totalGross));
+  setText('vst-gross',  fmt(totalGross));  setText('vst-noVat',  fmt(totalNoVat));
+  setText('vst-vat',    fmt(totalVat));    setText('vst-tax',    fmt(totalTax));
+  setText('vst-final',  fmt(totalFinal));  setText('vat-mini',   fmt(totalFinal));
+  renderVatTable();
+  setText('totalCommissions', fmt(totalComm));   setText('managers-mini',   fmt(totalComm));
+  setText('totalSalaries',    fmt(totalSal));    setText('salaries-mini',   fmt(totalSal));
+  setText('totalExpenses',    fmt(totalOther));  setText('expFilteredTotal',fmt(filtTotal));
+  setText('expenses-mini',    fmt(totalOther));
+  setText('d-totalInflows',  fmt(totalGross));  setText('d-revenueNoVat', fmt(totalNoVat));
+  setText('d-vatTotal',      fmt(totalVat));    setText('d-taxTotal',     fmt(totalTax));
+  setText('d-commissions',   fmt(totalComm));   setText('d-salaries',     fmt(totalSal));
+  setText('d-otherExpenses', fmt(totalOther));  setText('d-totalExpenses',fmt(totalAllExp));
+  setText('d-margin',        fmtPct(margin));   setText('dashboard-mini', fmt(netProfit));
+  var npEl=document.getElementById('d-netProfit');
+  if(npEl){ npEl.textContent=fmt(netProfit); npEl.className='dc-value '+(netProfit>=0?'green':'red'); }
+  var mEl=document.getElementById('d-margin');
+  if(mEl){ mEl.className='dc-value '+(margin>=0?'gold':'red'); }
+  renderCatSummary();
+
+  // ── TARGET (gross profit only — totalFinal = revenue after VAT+tax, before opex)
+  var grossProfit = totalFinal;
+  var tgt = parseFloat(state.target)||0;
+  var pct = tgt>0 ? (grossProfit/tgt)*100 : 0;
+  var remain = Math.max(tgt-grossProfit, 0);
+  var lang = state.lang;
+  var tier = pct>=100 ? 'success' : (pct>=50 ? 'normal' : 'warn');
+  var tierLabel = pct>=100 ? T[lang].statusSuccess : (pct>=50 ? T[lang].statusNormal : T[lang].statusWarn);
+
+  setText('target-current', fmt(grossProfit));
+  setText('target-amount',  fmt(tgt));
+  setText('target-remain',  fmt(remain));
+
+  var pctEl = document.getElementById('target-pct');
+  if (pctEl) {
+    pctEl.textContent = (tgt>0?pct:0).toFixed(2)+'%';
+    pctEl.className = 'target-pct-big tg-'+tier;
+  }
+  var bar = document.getElementById('target-bar');
+  if (bar) {
+    bar.style.width = Math.min(Math.max(pct,0),100).toFixed(1)+'%';
+    bar.className = 'target-progress-fill tg-'+tier;
+  }
+  var statusEl = document.getElementById('target-status');
+  if (statusEl) {
+    statusEl.textContent = tgt>0 ? tierLabel : '—';
+    statusEl.className = 'target-status-pill tg-'+tier;
+  }
+  setText('target-mini', (tgt>0?pct:0).toFixed(1)+'% · '+fmt(grossProfit));
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  PRINT & NOTIFICATION
+// ═══════════════════════════════════════════════════════════════════
+function printReport() { window.print(); }
+function showNotif(msg) {
+  var el=document.getElementById('notif');
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(window._nt);
+  window._nt=setTimeout(function(){ el.classList.remove('show'); }, 2600);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════════
+loadAppState();
+loadBackendCfg();
+loadMonthData(state.currentYear, state.currentMonth);
+renderAll();
+applyLang();
+applyAllCollapseStates();
+applyViewOnlyState();
+isDirty = false;          // initial load is clean
+updateSaveStatus();
+setCloudState(backendCfg.apiKey ? 'syncing' : 'offline');
+
+// Try to pull current month from backend on boot
+if (backendCfg.url && backendCfg.apiKey) {
+  bootSyncTmr = setTimeout(function(){
+    pullMonthFromBackend(state.currentYear, state.currentMonth).then(function(){
+      renderAll(); applyLang(); applyAllCollapseStates();
+    }).catch(function(){ setCloudState('offline'); });
+  }, 250);
+} else {
+  setCloudState('offline');
+}
+
+// Autosave every 30s when dirty
+startAutosave();
+
+// Warn before closing/refreshing if unsaved
+window.addEventListener('beforeunload', function(e) {
+  if (isDirty) { e.preventDefault(); e.returnValue=''; return ''; }
+});
+
+// Re-ping on tab regain focus
+window.addEventListener('online',  function(){ pingBackend(); });
+window.addEventListener('offline', function(){ setCloudState('offline'); });
+</script>
+</body>
+</html>
